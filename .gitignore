@@ -1,3 +1,10 @@
+#Relevent
+Lab1/.idea/*
+Lab1/cmake-build-debug
+.idea
+*.tar
+
+
 # Prerequisites
 *.d
 
@@ -50,3 +57,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+Lab1/CMakeLists.txt
+Lab1/.idea/inspectionProfiles/Project_Default.xml
+Lab1/.idea/Lab1.iml
+Lab1/.idea/misc.xml
+Lab1/.idea/modules.xml
+Lab1/.idea/vcs.xml
