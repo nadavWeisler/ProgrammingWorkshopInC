@@ -30,6 +30,7 @@
 #define INVALID_PARAM_COUNT "invalid param count"
 #define ASK_INPUT "‫‪Enter‬‬ ‫‪student‬‬ ‫‪info.‬‬ ‫‪To‬‬ ‫‪exit‬‬ ‫‪press‬‬ ‫‪q,‬‬ ‫‪then‬‬ ‫‪enter‬‬"
 #define BEST_STUDENT_TEXT "‫‪best‬‬ ‫‪student‬‬ ‫‪info‬‬ ‫‪is:‬‬"
+#define USAGE_ERROR "USAGE: You should write best, merge or quick, come on :("
 
 #define BEST "best"
 #define BEST_LENGTH 5
@@ -48,8 +49,6 @@ struct Student
     char city[FIELD_SIZE];
 };
 
-void getStudentsInputFromUser();
-
 typedef struct Student Student;
 
 char PARAMS_STRING[6][7] = {"Id", "Name", "Grade", "Age", "Country", "City"};
@@ -57,20 +56,25 @@ char PARAMS_STRING[6][7] = {"Id", "Name", "Grade", "Age", "Country", "City"};
 int studentsCount = 0;
 Student allStudents[MAX_STUDENTS];
 
-/// Print error messages
-/// \param param        Params
-/// \param msg          Error msg
-/// \param line         Line
+
+/**
+ * Generate input error messages
+ * @param param         Params
+ * @param line          Line
+ * @param msg           Error msg
+ */
 void generateInputError(char *param, int line, char *msg)
 {
     snprintf(msg, MAX_INPUT_LINE_LENGTH, "%s %s %s %s %d\n",
              START_ERROR_MSG, INVALID_ERROR, param, IN_LINE, line);
 }
 
-/// Validate that String is int
-/// \param param        String - char array
-/// \param length       Param length
-/// \return             0 if int, 1 otherwise
+/**
+ * Validate that String is int
+ * @param param             String - char array
+ * @param length            Param length
+ * @return                  0 if int, 1 otherwise
+ */
 int stringIsInt(char *param, int length)
 {
     for (int i = 0; i < length; i++)
@@ -90,11 +94,13 @@ int stringIsInt(char *param, int length)
     return TRUE;
 }
 
-/// Test numbers by check if it is number and between minValue and maxValue
-/// \param param        Param to check
-/// \param minValue     Minimal Value
-/// \param maxValue     Maximum Value
-/// \return             Return 0 if true, 1 otherwise
+/***
+ * Validate numbers by check if it is number and between minValue and maxValue
+ * @param param             Param to check
+ * @param minValue          Minimal Value
+ * @param maxValue          Maximum Value
+ * @return                  Return 0 if true, 1 otherwise
+ */
 int validateNumber(char *param, int minValue, int maxValue)
 {
     if (stringIsInt(param, FIELD_SIZE) == FALSE)
@@ -109,10 +115,12 @@ int validateNumber(char *param, int minValue, int maxValue)
     return TRUE;
 }
 
-/// Test string bestValue
-/// \param param        Param to validate
-/// \param length       Length to iterate
-/// \return             0 is True, 1 otherwise
+/**
+ * Validate string bestValue
+ * @param param         Param to validate
+ * @param length        Length to iterate
+ * @return              0 is True, 1 otherwise
+ */
 int validateString(char *param, int length)
 {
     for (int i = 0; i < length; i++)
@@ -129,10 +137,12 @@ int validateString(char *param, int length)
     return TRUE;
 }
 
-/// Get string length
-/// \param str          String reference
-/// \param maxSize      Max string size
-/// \return             String length
+/**
+ * Get string length
+ * @param str           String reference
+ * @param maxSize       Max string size
+ * @return              String length
+ */
 int getStringLength(char *str, int maxSize)
 {
     int result = 0;
@@ -150,9 +160,11 @@ int getStringLength(char *str, int maxSize)
     return result;
 }
 
-/// Test ID bestValue
-/// \param param        Param to check
-/// \return             Return 0 if true, 1 otherwise
+/**
+ * Validate ID
+ * @param param     Param to check
+ * @return          Return 0 if true, 1 otherwise
+ */
 int validateId(char *param)
 {
     if (getStringLength(param, FIELD_SIZE) != 10)
@@ -166,50 +178,65 @@ int validateId(char *param)
     return TRUE;
 }
 
-/// Test name param
-/// \param param        Param to check
-/// \return             Return 0 if true, 1 otherwise
+
+/**
+ * Validate name param
+ * @param param         Param to check
+ * @return              Return 0 if true, 1 otherwise
+ */
 int validateName(char *param)
 {
     return validateString(param, FIELD_SIZE);
 }
 
-/// Test age param
-/// \param param        Param to check
-/// \return             Return 0 if true, 1 otherwise
+
+/**
+ * Validate age param
+ * @param param     Param to check
+ * @return           Return 0 if true, 1 otherwise
+ */
 int validateAge(char *param)
 {
     return validateNumber(param, 18, 120);
 }
 
-/// Test grade param
-/// \param param        Param to check
-/// \return             Return 0 if true, 1 otherwise
+/**
+ * Validate grade param
+ * @param param     Param to check
+ * @return           Return 0 if true, 1 otherwise
+ */
 int validateGrade(char *param)
 {
     return validateNumber(param, 0, 100);
 }
 
-/// Test city param
-/// \param param        Param to check
-/// \return             Return 0 if true, 1 otherwise
+/**
+ * Validate city param
+ * @param param     Param to check
+ * @return           Return 0 if true, 1 otherwise
+ */
 int validateCity(char *param)
 {
     return validateString(param, FIELD_SIZE);
 }
 
-/// Test country param
-/// \param param        Param to check
-/// \return             Return 0 if true, 1 otherwise
+/**
+ * Validate country param
+ * @param param     Param to check
+ * @return           Return 0 if true, 1 otherwise
+ */
 int validateCountry(char *param)
 {
     return validateString(param, FIELD_SIZE);
 }
 
-/// Test param
-/// \param param        Param to check
-/// \param paramType    Param type
-/// \return             Return 0 if true, 1 otherwise
+
+/**
+ * Validate param
+ * @param param        Param to check
+ * @param paramType    Param type
+ * @return             Return 0 if true, 1 otherwise
+ */
 int validateParam(char *param, int paramType)
 {
     switch (paramType)
@@ -231,21 +258,26 @@ int validateParam(char *param, int paramType)
     }
 }
 
-/// Rest string array
-/// \param str          Char array
-/// \param length       Array length
+/**
+ * Reset string
+ * @param str       Char array
+ * @param length    Array length
+ */
 void resetString(char *str, int length)
 {
     for (int i = 0; i < length; i++)
     {
-        str[i] = '\0';
+        str[i] = EMPTY_CHAR;
     }
 }
 
-/// Add param to student object
-/// \param student      Student pointer
-/// \param paramVal     Param bestValue
-/// \param paramType    Param Type
+
+/**
+ *
+ * @param student       Student pointer
+ * @param paramVal      Param bestValue
+ * @param paramType     Param Type
+ */
 void addParamToStudent(Student *student, char *paramVal, int paramType)
 {
     int intParamVal = 0;
@@ -299,8 +331,10 @@ void addParamToStudent(Student *student, char *paramVal, int paramType)
     }
 }
 
-/// Get best student index from allstudents array
-/// \return             Best student index
+/**
+ * Get best student index from allstudents array
+ * @return      Best student index
+ */
 int getBestStudent()
 {
     float bestValue = -1.0;
@@ -318,7 +352,10 @@ int getBestStudent()
     return index;
 }
 
-/// Print best student
+
+/**
+ *  Print best student
+ */
 void printBestStudent()
 {
     int index = getBestStudent();
@@ -333,11 +370,14 @@ void printBestStudent()
     }
 }
 
-/// Update fields to existing student
-/// \param paramCount   Param count (0-5)
-/// \param field        Field bestValue
-/// \param newStudent   Student pointer
-/// \return             0 if worked, 1 otherwise
+
+/**
+ * Update fields to existing student
+ * @param paramCount        Param count (0-5)
+ * @param field             Field value
+ * @param newStudent        Student pointer
+ * @return                  0 if worked, 1 otherwise
+ */
 int updateFieldsInStudent(int paramCount, char *field, Student *newStudent)
 {
     if (validateParam(field, paramCount) == TRUE)
@@ -351,10 +391,16 @@ int updateFieldsInStudent(int paramCount, char *field, Student *newStudent)
     }
 }
 
-/// Generate input line to student
-/// \param inputLine        Input line (char array)
-/// \param lineLength       Input line length
-/// \return                 Student object
+
+/**
+ * Generate input line to student
+ * @param newStudent        Student pointer
+ * @param errorMsg          Error message pointer
+ * @param inputLine         Input line (char array)
+ * @param lineLength        Input line length
+ * @param lineCount         Lines count
+ * @return                  0 if worked, 1 otherwise
+ */
 int inputLineToStudent(Student *newStudent, char *errorMsg, char *inputLine, int lineLength, int lineCount)
 {
     int paramCount = 0;
@@ -395,7 +441,7 @@ int inputLineToStudent(Student *newStudent, char *errorMsg, char *inputLine, int
     {
         if (paramCount != CITY_PARAM)
         {
-            sprintf(errorMsg, "%s %s %s %d\n", START_ERROR_MSG, INVALID_PARAM_COUNT, IN_LINE, lineCount);
+            sprintf(errorMsg, "%s %s %s %d", START_ERROR_MSG, INVALID_PARAM_COUNT, IN_LINE, lineCount);
             returnValue = FALSE;
 
         }
@@ -420,9 +466,11 @@ int inputLineToStudent(Student *newStudent, char *errorMsg, char *inputLine, int
     return returnValue;
 }
 
-/// Check if stop
-/// \param input        Input to check
-/// \return             0 if stop, 1 otherwise
+/**
+ * Check if stop
+ * @param input     Input to check
+ * @return           0 if stop, 1 otherwise
+ */
 int ifStop(char *input)
 {
     if (input[0] == NEW_LINE)
@@ -436,11 +484,13 @@ int ifStop(char *input)
     return FALSE;
 }
 
-/// Check if input is equal to str
-/// \param input        String
-/// \param str          String
-/// \param length       Length
-/// \return             0 if equal, 1 otherwise
+/**
+ * Check if input is equal to str
+ * @param input     String
+ * @param str       String
+ * @param length    Length
+ * @return          0 if equal, 1 otherwise
+ */
 int ifEqual(char *input, char *str, int length)
 {
     for (int i = 0; i < length; i++)
@@ -457,14 +507,9 @@ int ifEqual(char *input, char *str, int length)
     return FALSE;
 }
 
-/// Get students from user and print the best one
-void getStudentsAndPrintBest()
-{
-    getStudentsInputFromUser();
-    printBestStudent();
-}
-
-/// Get students input from user
+/**
+ * Get students input from user
+ */
 void getStudentsInputFromUser()
 {
     char inputVal[MAX_INPUT_LINE_LENGTH];
@@ -490,11 +535,23 @@ void getStudentsInputFromUser()
     }
 }
 
-/// Merge between 2 sub arrays of students
-/// \param firstStart       First sub array start index
-/// \param firstEnd         First sub array end index
-/// \param secondStart      Second sub array start index
-/// \param secondEnd        Second sub array end index
+/**
+ * Get students from user and print the best one
+ */
+void getStudentsAndPrintBest()
+{
+    getStudentsInputFromUser();
+    printBestStudent();
+}
+
+
+/**
+ * Merge between 2 sub arrays of students
+ * @param firstStart    First sub array start index
+ * @param firstEnd      First sub array end index
+ * @param secondStart   Second sub array start index
+ * @param secondEnd     Second sub array end index
+ */
 void mergeTwoStudentsSubArray(int firstStart, int firstEnd, int secondStart, int secondEnd)
 {
     Student helpArray[studentsCount];
@@ -537,9 +594,11 @@ void mergeTwoStudentsSubArray(int firstStart, int firstEnd, int secondStart, int
     }
 }
 
-/// Merge sort students by their grades
-/// \param lowIndex         Low index
-/// \param highIndex        High index
+/**
+ * Merge sort students by their grades
+ * @param lowIndex      Low index
+ * @param highIndex     High index
+ */
 void mergeSortStudentsByGrades(int lowIndex, int highIndex)
 {
     if (lowIndex >= highIndex)
@@ -552,9 +611,11 @@ void mergeSortStudentsByGrades(int lowIndex, int highIndex)
     mergeTwoStudentsSubArray(lowIndex, middleIndex, middleIndex + 1, highIndex);
 }
 
-/// Swap two students values
-/// \param student1         First student pointer
-/// \param student2         Second student pointer
+/**
+ * Swap two students values
+ * @param student1      First student pointer
+ * @param student2      Second student pointer
+ */
 void swapStudents(Student *student1, Student *student2)
 {
     Student helpStr = *student1;
@@ -562,10 +623,13 @@ void swapStudents(Student *student1, Student *student2)
     *student2 = helpStr;
 }
 
-/// Get divider for GetStudentsAndQuickSortByNames sort
-/// \param lowIndex         Low index
-/// \param highIndex        High index
-/// \return
+
+/**
+ * Get divider for GetStudentsAndQuickSortByNames sort
+ * @param lowIndex      Low index
+ * @param highIndex     High index
+ * @return              Divider
+ */
 int getDivider(int lowIndex, int highIndex)
 {
     char *pivot = allStudents[highIndex].name;
@@ -582,9 +646,11 @@ int getDivider(int lowIndex, int highIndex)
     return smallestElementIndex + 1;
 }
 
-/// Quick sort students by their name
-/// \param lowIndex         Low index
-/// \param highIndex        High index
+/**
+ * Quick sort students by their name
+ * @param lowIndex      Low index
+ * @param highIndex     High index
+ */
 void quickSortStudents(int lowIndex, int highIndex)
 {
     if (highIndex > lowIndex)
@@ -595,29 +661,36 @@ void quickSortStudents(int lowIndex, int highIndex)
     }
 }
 
-/// Get students from users and merge sort them by their grades
+/**
+ * Get students from users and merge sort them by their grades
+ */
 void getStudentsAndMergeSortByGrades()
 {
     getStudentsInputFromUser();
     mergeSortStudentsByGrades(0, studentsCount);
 }
 
-/// Get students from users and quick sort them by their names
+
+/**
+ * Get students from users and quick sort them by their names
+ */
 void getStudentsAndQuickSortByNames()
 {
     getStudentsInputFromUser();
     quickSortStudents(0, studentsCount - 1);
 }
 
-/// Main function
-/// \param argc         Arguments count
-/// \param argv         Arguments array
-/// \return
+/**
+ * Main function
+ * @param argc      Arguments count
+ * @param argv      Arguments array
+ * @return          0 if worked, 1 otherwise
+ */
 int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        printf("BadMan\n");
+        printf("%s\n", USAGE_ERROR);
         return FALSE;
     }
     else
@@ -636,7 +709,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            printf("Bad\n");
+            printf("%s\n", USAGE_ERROR);
             return FALSE;
         }
     }
