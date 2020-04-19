@@ -35,10 +35,11 @@
 #define BEST_LENGTH 5
 #define MERGE "merge"
 #define MERGE_LENGTH 6
-#define QUICK "GetStudentsAndQuickSortByNames"
+#define QUICK "quick"
 #define QUICK_LENGTH 6
 
-struct Student {
+struct Student
+{
     char id[ID_LENGTH + 1];
     char name[FIELD_SIZE];
     int grade;
@@ -47,7 +48,7 @@ struct Student {
     char city[FIELD_SIZE];
 };
 
-void GetStudentsInputFromUser();
+void getStudentsInputFromUser();
 
 typedef struct Student Student;
 
@@ -60,7 +61,8 @@ Student allStudents[MAX_STUDENTS];
 /// \param param        Params
 /// \param msg          Error msg
 /// \param line         Line
-void GenerateInputError(char *param, int line, char *msg) {
+void generateInputError(char *param, int line, char *msg)
+{
     snprintf(msg, MAX_INPUT_LINE_LENGTH, "%s %s %s %s %d\n",
              START_ERROR_MSG, INVALID_ERROR, param, IN_LINE, line);
 }
@@ -69,12 +71,18 @@ void GenerateInputError(char *param, int line, char *msg) {
 /// \param param        String - char array
 /// \param length       Param length
 /// \return             0 if int, 1 otherwise
-int StringIsInt(char *param, int length) {
-    for (int i = 0; i < length; i++) {
-        if (param[i] == EMPTY_CHAR) {
+int stringIsInt(char *param, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        if (param[i] == EMPTY_CHAR)
+        {
             break;
-        } else {
-            if (!isdigit(param[i])) {
+        }
+        else
+        {
+            if (!isdigit(param[i]))
+            {
                 return FALSE;
             }
         }
@@ -87,12 +95,15 @@ int StringIsInt(char *param, int length) {
 /// \param minValue     Minimal Value
 /// \param maxValue     Maximum Value
 /// \return             Return 0 if true, 1 otherwise
-int TestNumber(char *param, int minValue, int maxValue) {
-    if (StringIsInt(param, FIELD_SIZE) == FALSE) {
+int validateNumber(char *param, int minValue, int maxValue)
+{
+    if (stringIsInt(param, FIELD_SIZE) == FALSE)
+    {
         return FALSE;
     }
     int intParam = atoi(param);
-    if (intParam > maxValue || intParam < minValue) {
+    if (intParam > maxValue || intParam < minValue)
+    {
         return FALSE;
     }
     return TRUE;
@@ -102,11 +113,16 @@ int TestNumber(char *param, int minValue, int maxValue) {
 /// \param param        Param to validate
 /// \param length       Length to iterate
 /// \return             0 is True, 1 otherwise
-int TestString(char *param, int length) {
-    for (int i = 0; i < length; i++) {
-        if (param[i] == EMPTY_CHAR) {
+int validateString(char *param, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        if (param[i] == EMPTY_CHAR)
+        {
             break;
-        } else if (!isalpha(param[i]) && param[i] == HYPHEN) {
+        }
+        else if (!isalpha(param[i]) && param[i] == HYPHEN)
+        {
             return FALSE;
         }
     }
@@ -117,12 +133,17 @@ int TestString(char *param, int length) {
 /// \param str          String reference
 /// \param maxSize      Max string size
 /// \return             String length
-int GetStringLength(char *str, int maxSize) {
+int getStringLength(char *str, int maxSize)
+{
     int result = 0;
-    for (int i = 0; i < maxSize; i++) {
-        if (str[i] == EMPTY_CHAR) {
+    for (int i = 0; i < maxSize; i++)
+    {
+        if (str[i] == EMPTY_CHAR)
+        {
             break;
-        } else {
+        }
+        else
+        {
             result++;
         }
     }
@@ -132,10 +153,14 @@ int GetStringLength(char *str, int maxSize) {
 /// Test ID bestValue
 /// \param param        Param to check
 /// \return             Return 0 if true, 1 otherwise
-int TestId(char *param) {
-    if (GetStringLength(param, FIELD_SIZE) != 10) {
+int validateId(char *param)
+{
+    if (getStringLength(param, FIELD_SIZE) != 10)
+    {
         return FALSE;
-    } else if (StringIsInt(param, FIELD_SIZE) == FALSE) {
+    }
+    else if (stringIsInt(param, FIELD_SIZE) == FALSE)
+    {
         return FALSE;
     }
     return TRUE;
@@ -144,56 +169,63 @@ int TestId(char *param) {
 /// Test name param
 /// \param param        Param to check
 /// \return             Return 0 if true, 1 otherwise
-int TestName(char *param) {
-    return TestString(param, FIELD_SIZE);
+int validateName(char *param)
+{
+    return validateString(param, FIELD_SIZE);
 }
 
 /// Test age param
 /// \param param        Param to check
 /// \return             Return 0 if true, 1 otherwise
-int TestAge(char *param) {
-    return TestNumber(param, 18, 120);
+int validateAge(char *param)
+{
+    return validateNumber(param, 18, 120);
 }
 
 /// Test grade param
 /// \param param        Param to check
 /// \return             Return 0 if true, 1 otherwise
-int TestGrade(char *param) {
-    return TestNumber(param, 0, 100);
+int validateGrade(char *param)
+{
+    return validateNumber(param, 0, 100);
 }
 
 /// Test city param
 /// \param param        Param to check
 /// \return             Return 0 if true, 1 otherwise
-int TestCity(char *param) {
-    return TestString(param, FIELD_SIZE);
+int validateCity(char *param)
+{
+    return validateString(param, FIELD_SIZE);
 }
 
 /// Test country param
 /// \param param        Param to check
 /// \return             Return 0 if true, 1 otherwise
-int TestCountry(char *param) {
-    return TestString(param, FIELD_SIZE);
+int validateCountry(char *param)
+{
+    return validateString(param, FIELD_SIZE);
 }
 
 /// Test param
 /// \param param        Param to check
 /// \param paramType    Param type
 /// \return             Return 0 if true, 1 otherwise
-int TestParam(char *param, int paramType) {
-    switch (paramType) {
+int validateParam(char *param, int paramType)
+{
+    switch (paramType)
+    {
         case ID_PARAM:
-            return TestId(param);
+            return validateId(param);
         case NAME_PARAM:
-            return TestName(param);
+            return validateName(param);
         case AGE_PARAM:
-            return TestAge(param);
+            return validateAge(param);
         case GRADE_PARAM:
-            return TestGrade(param);
+            return validateGrade(param);
         case COUNTRY_PARAM:
-            return TestCountry(param);
+            return validateCountry(param);
         case CITY_PARAM:
-            return TestCity(param);
+            return validateCity(param);
         default:
             return FALSE;
     }
@@ -202,8 +234,10 @@ int TestParam(char *param, int paramType) {
 /// Rest string array
 /// \param str          Char array
 /// \param length       Array length
-void ResetString(char *str, int length) {
-    for (int i = 0; i < length; i++) {
+void resetString(char *str, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
         str[i] = '\0';
     }
 }
@@ -212,19 +246,24 @@ void ResetString(char *str, int length) {
 /// \param student      Student pointer
 /// \param paramVal     Param bestValue
 /// \param paramType    Param Type
-void AddParamToStudent(Student *student, char *paramVal, int paramType) {
+void addParamToStudent(Student *student, char *paramVal, int paramType)
+{
     int intParamVal = 0;
-    switch (paramType) {
+    switch (paramType)
+    {
         case ID_PARAM:
-            for (int i = 0; i < ID_LENGTH; i++) {
+            for (int i = 0; i < ID_LENGTH; i++)
+            {
                 student->id[i] = paramVal[i];
             }
             student->id[ID_LENGTH] = EMPTY_CHAR;
             break;
         case NAME_PARAM:
-            for (int i = 0; i < FIELD_SIZE; i++) {
+            for (int i = 0; i < FIELD_SIZE; i++)
+            {
                 student->name[i] = paramVal[i];
-                if (paramVal[i] == EMPTY_CHAR) {
+                if (paramVal[i] == EMPTY_CHAR)
+                {
                     break;
                 }
             }
@@ -238,17 +277,21 @@ void AddParamToStudent(Student *student, char *paramVal, int paramType) {
             student->grade = intParamVal;
             break;
         case COUNTRY_PARAM:
-            for (int i = 0; i < FIELD_SIZE; i++) {
+            for (int i = 0; i < FIELD_SIZE; i++)
+            {
                 student->country[i] = paramVal[i];
-                if (paramVal[i] == EMPTY_CHAR) {
+                if (paramVal[i] == EMPTY_CHAR)
+                {
                     break;
                 }
             }
             break;
         case CITY_PARAM:
-            for (int i = 0; i < FIELD_SIZE; i++) {
+            for (int i = 0; i < FIELD_SIZE; i++)
+            {
                 student->city[i] = paramVal[i];
-                if (paramVal[i] == EMPTY_CHAR) {
+                if (paramVal[i] == EMPTY_CHAR)
+                {
                     break;
                 }
             }
@@ -258,13 +301,16 @@ void AddParamToStudent(Student *student, char *paramVal, int paramType) {
 
 /// Get best student index from allstudents array
 /// \return             Best student index
-int GetBestStudent() {
+int getBestStudent()
+{
     float bestValue = -1.0;
     int index = -1;
-    for (int i = 0; i < studentsCount; i++) {
+    for (int i = 0; i < studentsCount; i++)
+    {
         float grade = (float) allStudents[i].grade;
         float age = (float) allStudents[i].age;
-        if ((grade / age) > bestValue) {
+        if ((grade / age) > bestValue)
+        {
             bestValue = grade / age;
             index = i;
         }
@@ -273,9 +319,11 @@ int GetBestStudent() {
 }
 
 /// Print best student
-void printBestStudent() {
-    int index = GetBestStudent();
-    if (index > -1) {
+void printBestStudent()
+{
+    int index = getBestStudent();
+    if (index > -1)
+    {
         char studentText[MAX_INPUT_LINE_LENGTH];
         sprintf(studentText, "%s %s,%s,%d,%d,%s,%s", BEST_STUDENT_TEXT,
                 allStudents[index].id, allStudents[index].name,
@@ -290,11 +338,15 @@ void printBestStudent() {
 /// \param field        Field bestValue
 /// \param newStudent   Student pointer
 /// \return             0 if worked, 1 otherwise
-int updateFieldsInStudent(int paramCount, char *field, Student *newStudent) {
-    if (TestParam(field, paramCount) == TRUE) {
-        AddParamToStudent(newStudent, field, paramCount);
+int updateFieldsInStudent(int paramCount, char *field, Student *newStudent)
+{
+    if (validateParam(field, paramCount) == TRUE)
+    {
+        addParamToStudent(newStudent, field, paramCount);
         return TRUE;
-    } else {
+    }
+    else
+    {
         return FALSE;
     }
 }
@@ -303,44 +355,65 @@ int updateFieldsInStudent(int paramCount, char *field, Student *newStudent) {
 /// \param inputLine        Input line (char array)
 /// \param lineLength       Input line length
 /// \return                 Student object
-int inputLineToStudent(Student *newStudent, char *errorMsg, char *inputLine, int lineLength, int lineCount) {
+int inputLineToStudent(Student *newStudent, char *errorMsg, char *inputLine, int lineLength, int lineCount)
+{
     int paramCount = 0;
     int returnValue = TRUE;
     char field[FIELD_SIZE];
     int startField = 0;
     int error_break = FALSE;
-    for (int i = 0; i < lineLength; i++) {
-        if (paramCount > CITY_PARAM) {
+    for (int i = 0; i < lineLength; i++)
+    {
+        if (paramCount > CITY_PARAM)
+        {
             break;
-        } else if (inputLine[i] == NEW_LINE) {
+        }
+        else if (inputLine[i] == NEW_LINE)
+        {
             continue;
-        } else if (inputLine[i] == COMMA) {
-            if (updateFieldsInStudent(paramCount, field, newStudent) == TRUE) {
-                ResetString(field, i - (startField));
+        }
+        else if (inputLine[i] == COMMA)
+        {
+            if (updateFieldsInStudent(paramCount, field, newStudent) == TRUE)
+            {
+                resetString(field, i - (startField));
                 (startField) = i + 1;
                 paramCount++;
-            } else {
+            }
+            else
+            {
                 error_break = TRUE;
                 break;
             }
-        } else {
+        }
+        else
+        {
             field[i - startField] = inputLine[i];
         }
     }
-    if (error_break == FALSE) {
-        if (paramCount != CITY_PARAM) {
+    if (error_break == FALSE)
+    {
+        if (paramCount != CITY_PARAM)
+        {
             sprintf(errorMsg, "%s %s %s %d\n", START_ERROR_MSG, INVALID_PARAM_COUNT, IN_LINE, lineCount);
             returnValue = FALSE;
 
-        } else {
-            if (updateFieldsInStudent(paramCount, field, newStudent) == TRUE) {
-            } else {
-                GenerateInputError(PARAMS_STRING[paramCount], lineCount, errorMsg);
+        }
+        else
+        {
+            if (updateFieldsInStudent(paramCount, field, newStudent) == TRUE)
+            {
+            }
+            else
+            {
+                generateInputError(PARAMS_STRING[paramCount], lineCount, errorMsg);
                 returnValue = FALSE;
             }
         }
-    } else {
-        GenerateInputError(PARAMS_STRING[paramCount], lineCount, errorMsg);
+    }
+    else
+    {
+        generateInputError(PARAMS_STRING[paramCount], lineCount, errorMsg);
         returnValue = FALSE;
     }
 
@@ -350,11 +423,14 @@ int inputLineToStudent(Student *newStudent, char *errorMsg, char *inputLine, int
 /// Check if stop
 /// \param input        Input to check
 /// \return             0 if stop, 1 otherwise
-int IfStop(char *input) {
-    if (input[0] == NEW_LINE) {
+int ifStop(char *input)
+{
+    if (input[0] == NEW_LINE)
+    {
         return FALSE;
     }
-    if (input[0] == STOP && input[1] == NEW_LINE) {
+    if (input[0] == STOP && input[1] == NEW_LINE)
+    {
         return TRUE;
     }
     return FALSE;
@@ -365,11 +441,16 @@ int IfStop(char *input) {
 /// \param str          String
 /// \param length       Length
 /// \return             0 if equal, 1 otherwise
-int ifEqual(char *input, char *str, int length) {
-    for (int i = 0; i < length; i++) {
-        if ((str[i] == EMPTY_CHAR || str[i] == NEW_LINE) && (input[i] == EMPTY_CHAR || input[i] == NEW_LINE)) {
+int ifEqual(char *input, char *str, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        if ((str[i] == EMPTY_CHAR || str[i] == NEW_LINE) && (input[i] == EMPTY_CHAR || input[i] == NEW_LINE))
+        {
             return TRUE;
-        } else if (str[i] != input[i]) {
+        }
+        else if (str[i] != input[i])
+        {
             return FALSE;
         }
     }
@@ -377,24 +458,30 @@ int ifEqual(char *input, char *str, int length) {
 }
 
 /// Get students from user and print the best one
-void GetStudentsAndPrintBest() {
-    GetStudentsInputFromUser();
+void getStudentsAndPrintBest()
+{
+    getStudentsInputFromUser();
     printBestStudent();
 }
 
 /// Get students input from user
-void GetStudentsInputFromUser() {
+void getStudentsInputFromUser()
+{
     char inputVal[MAX_INPUT_LINE_LENGTH];
     int lineCount = 0;
     printf("%s\n", ASK_INPUT);
     fgets(inputVal, MAX_INPUT_LINE_LENGTH, stdin);
-    while (IfStop(inputVal) == FALSE) {
+    while (ifStop(inputVal) == FALSE)
+    {
         Student newStudent;
         char errorMsg[MAX_INPUT_LINE_LENGTH];
-        if (inputLineToStudent(&newStudent, errorMsg, inputVal, MAX_INPUT_LINE_LENGTH, lineCount) == TRUE) {
+        if (inputLineToStudent(&newStudent, errorMsg, inputVal, MAX_INPUT_LINE_LENGTH, lineCount) == TRUE)
+        {
             allStudents[studentsCount] = newStudent;
             studentsCount++;
-        } else {
+        }
+        else
+        {
             fputs(errorMsg, stdout);
         }
         lineCount++;
@@ -408,36 +495,44 @@ void GetStudentsInputFromUser() {
 /// \param firstEnd         First sub array end index
 /// \param secondStart      Second sub array start index
 /// \param secondEnd        Second sub array end index
-void MergeTwoStudentsSubArray(int firstStart, int firstEnd, int secondStart, int secondEnd) {
+void mergeTwoStudentsSubArray(int firstStart, int firstEnd, int secondStart, int secondEnd)
+{
     Student helpArray[studentsCount];
     int firstArrayIndex = firstStart;
     int secondArrayIndex = secondStart;
     int helpArrayIndex = 0;
 
-    while (firstArrayIndex <= firstEnd && secondArrayIndex <= secondEnd) {
-        if (allStudents[firstArrayIndex].grade >= allStudents[secondArrayIndex].grade) {
+    while (firstArrayIndex <= firstEnd && secondArrayIndex <= secondEnd)
+    {
+        if (allStudents[firstArrayIndex].grade >= allStudents[secondArrayIndex].grade)
+        {
             helpArray[helpArrayIndex] = allStudents[firstArrayIndex];
             firstArrayIndex++;
-        } else {
+        }
+        else
+        {
             helpArray[helpArrayIndex] = allStudents[secondArrayIndex];
             secondArrayIndex++;
         }
         helpArrayIndex++;
     }
 
-    while (firstArrayIndex <= firstEnd) {
+    while (firstArrayIndex <= firstEnd)
+    {
         helpArray[helpArrayIndex] = allStudents[firstArrayIndex];
         firstArrayIndex++;
         helpArrayIndex++;
     }
 
-    while (secondArrayIndex <= secondEnd) {
+    while (secondArrayIndex <= secondEnd)
+    {
         helpArray[helpArrayIndex] = allStudents[secondArrayIndex];
         secondArrayIndex++;
         helpArrayIndex++;
     }
 
-    for (int i = 0; i <= helpArrayIndex; i++) {
+    for (int i = 0; i <= helpArrayIndex; i++)
+    {
         allStudents[firstStart + i] = helpArray[i];
     }
 }
@@ -445,20 +540,23 @@ void MergeTwoStudentsSubArray(int firstStart, int firstEnd, int secondStart, int
 /// Merge sort students by their grades
 /// \param lowIndex         Low index
 /// \param highIndex        High index
-void MergeSortStudentsByGrades(int lowIndex, int highIndex) {
-    if (lowIndex >= highIndex) {
+void mergeSortStudentsByGrades(int lowIndex, int highIndex)
+{
+    if (lowIndex >= highIndex)
+    {
         return;
     }
     int middleIndex = (lowIndex + highIndex) / 2;
-    MergeSortStudentsByGrades(lowIndex, middleIndex);
-    MergeSortStudentsByGrades(middleIndex + 1, highIndex);
-    MergeTwoStudentsSubArray(lowIndex, middleIndex, middleIndex + 1, highIndex);
+    mergeSortStudentsByGrades(lowIndex, middleIndex);
+    mergeSortStudentsByGrades(middleIndex + 1, highIndex);
+    mergeTwoStudentsSubArray(lowIndex, middleIndex, middleIndex + 1, highIndex);
 }
 
 /// Swap two students values
 /// \param student1         First student pointer
 /// \param student2         Second student pointer
-void SwapStudents(Student *student1, Student *student2) {
+void swapStudents(Student *student1, Student *student2)
+{
     Student helpStr = *student1;
     *student1 = *student2;
     *student2 = helpStr;
@@ -468,58 +566,76 @@ void SwapStudents(Student *student1, Student *student2) {
 /// \param lowIndex         Low index
 /// \param highIndex        High index
 /// \return
-int GetDivider(int lowIndex, int highIndex) {
+int getDivider(int lowIndex, int highIndex)
+{
     char *pivot = allStudents[highIndex].name;
     int smallestElementIndex = lowIndex - 1;
-    for (int i = lowIndex; i <= highIndex; i++) {
-        if (pivot > allStudents[i].name) {
+    for (int i = lowIndex; i <= highIndex; i++)
+    {
+        if (pivot > allStudents[i].name)
+        {
             smallestElementIndex++;
-            SwapStudents(&allStudents[smallestElementIndex], &allStudents[i]);
+            swapStudents(&allStudents[smallestElementIndex], &allStudents[i]);
         }
     }
-    SwapStudents(&allStudents[smallestElementIndex], &allStudents[highIndex]);
+    swapStudents(&allStudents[smallestElementIndex], &allStudents[highIndex]);
     return smallestElementIndex + 1;
 }
 
 /// Quick sort students by their name
 /// \param lowIndex         Low index
 /// \param highIndex        High index
-void QuickSortStudents(int lowIndex, int highIndex) {
-    if (highIndex > lowIndex) {
-        int divider = GetDivider(lowIndex, highIndex);
-        QuickSortStudents(lowIndex, divider - 1);
-        QuickSortStudents(divider + 1, highIndex);
+void quickSortStudents(int lowIndex, int highIndex)
+{
+    if (highIndex > lowIndex)
+    {
+        int divider = getDivider(lowIndex, highIndex);
+        quickSortStudents(lowIndex, divider - 1);
+        quickSortStudents(divider + 1, highIndex);
     }
 }
 
 /// Get students from users and merge sort them by their grades
-void GetStudentsAndMergeSortByGrades() {
-    GetStudentsInputFromUser();
-    MergeSortStudentsByGrades(0, studentsCount);
+void getStudentsAndMergeSortByGrades()
+{
+    getStudentsInputFromUser();
+    mergeSortStudentsByGrades(0, studentsCount);
 }
 
 /// Get students from users and quick sort them by their names
-void GetStudentsAndQuickSortByNames() {
-    GetStudentsInputFromUser();
-    QuickSortStudents(0, studentsCount - 1);
+void getStudentsAndQuickSortByNames()
+{
+    getStudentsInputFromUser();
+    quickSortStudents(0, studentsCount - 1);
 }
 
 /// Main function
 /// \param argc         Arguments count
 /// \param argv         Arguments array
 /// \return
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
+int main(int argc, char *argv[])
+{
+    if (argc != 2)
+    {
         printf("BadMan\n");
         return FALSE;
-    } else {
-        if (ifEqual(argv[1], BEST, BEST_LENGTH)) {
-            GetStudentsAndPrintBest();
-        } else if (ifEqual(argv[1], MERGE, MERGE_LENGTH)) {
-            GetStudentsAndMergeSortByGrades();
-        } else if (ifEqual(argv[1], QUICK, QUICK_LENGTH)) {
-            GetStudentsAndQuickSortByNames();
-        } else {
+    }
+    else
+    {
+        if (ifEqual(argv[1], BEST, BEST_LENGTH))
+        {
+            getStudentsAndPrintBest();
+        }
+        else if (ifEqual(argv[1], MERGE, MERGE_LENGTH))
+        {
+            getStudentsAndMergeSortByGrades();
+        }
+        else if (ifEqual(argv[1], QUICK, QUICK_LENGTH))
+        {
+            getStudentsAndQuickSortByNames();
+        }
+        else
+        {
             printf("Bad\n");
             return FALSE;
         }
