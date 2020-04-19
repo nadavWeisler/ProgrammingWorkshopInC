@@ -29,6 +29,7 @@
 #define IN_LINE "in line"
 #define INVALID_PARAM_COUNT "invalid param count"
 #define ASK_INPUT "‫‪Enter‬‬ ‫‪student‬‬ ‫‪info.‬‬ ‫‪To‬‬ ‫‪exit‬‬ ‫‪press‬‬ ‫‪q,‬‬ ‫‪then‬‬ ‫‪enter‬‬"
+#define BEST_STUDENT_TEXT "‫‪best‬‬ ‫‪student‬‬ ‫‪info‬‬ ‫‪is:‬‬"
 
 struct Student {
     char id[ID_LENGTH + 1];
@@ -37,8 +38,10 @@ struct Student {
     int age;
     char country[FIELD_SIZE];
     char city[FIELD_SIZE];
-    int realStudent;
 };
+
+void GetStudentsInputFromUser();
+
 typedef struct Student Student;
 
 char PARAMS_STRING[6][7] = {"Id", "Name", "Grade", "Age", "Country", "City"};
@@ -246,16 +249,31 @@ void AddParamToStudent(Student *student, char *paramVal, int paramType) {
     }
 }
 
-/// Print student
-/// \param student      Student object
-void printStudent(Student student) {
-    printf("Id: %s\n", student.id);
-    printf("Name: %s\n", student.name);
-    printf("Grade: %d\n", student.grade);
-    printf("Age: %d\n", student.age);
-    printf("Country: %s\n", student.country);
-    printf("City: %s\n", student.city);
-    printf("Real: %d\n", student.realStudent);
+int GetBestStudent() {
+    float bestValue = -1.0;
+    int index = -1;
+    for (int i = 0; i < studentsCount; i++) {
+        float grade = (float) allStudents[i].grade;
+        float age = (float) allStudents[i].age;
+        if ((grade / age) > bestValue) {
+            bestValue = grade / age;
+            index = i;
+        }
+    }
+    return index;
+}
+
+/// Print best student
+void printBestStudent() {
+    int index = GetBestStudent();
+    if (index > -1) {
+        char studentText[MAX_INPUT_LINE_LENGTH];
+        sprintf(studentText, "%s %s,%s,%d,%d,%s,%s", BEST_STUDENT_TEXT,
+                allStudents[index].id, allStudents[index].name,
+                allStudents[index].grade, allStudents[index].age,
+                allStudents[index].country, allStudents[index].city);
+        fputs(studentText, stdout);
+    }
 }
 
 /// Update fields to existing student
@@ -333,23 +351,16 @@ int IfStop(char *input) {
     return FALSE;
 }
 
-int GetBestStudent() {
-    float bestValue = -1.0;
-    int index = -1;
-    for (int i = 0; i < studentsCount; i++) {
-        float grade = (float) allStudents[studentsCount].grade;
-        float age = (float) allStudents[studentsCount].age;
-        if ((grade / age) > bestValue) {
-            bestValue = grade / age;
-            index = i;
-        }
-    }
-    return index;
+/// Get best student
+/// \return
+int best() {
+    GetStudentsInputFromUser();
+    printBestStudent();
+    return 0;
 }
 
-/// Main function
-/// \return
-int main() {
+/// Get students input from user
+void GetStudentsInputFromUser() {
     char inputVal[MAX_INPUT_LINE_LENGTH];
     int lineCount = 0;
     printf("%s\n", ASK_INPUT);
@@ -367,9 +378,109 @@ int main() {
         printf("%s\n", ASK_INPUT);
         fgets(inputVal, MAX_INPUT_LINE_LENGTH, stdin);
     }
-    int index = GetBestStudent();
-    if(index != -1){
-        printStudent(allStudents[index]);
+}
+
+/// Merge between 2 sub arrays of students
+/// \param firstStart       First sub array start index
+/// \param firstEnd         First sub array end index
+/// \param secondStart      Second sub array start index
+/// \param secondEnd        Second sub array end index
+void MergeFunction(int firstStart, int firstEnd, int secondStart, int secondEnd){
+    Student helpArray[studentsCount];
+    int firstArrayIndex = firstStart;
+    int secondArrayIndex = secondStart;
+    int helpArrayIndex = 0;
+
+    while(firstArrayIndex <= firstEnd && secondArrayIndex <= secondEnd){
+        if(allStudents[firstArrayIndex].grade >= allStudents[secondArrayIndex].grade){
+            helpArray[helpArrayIndex] = allStudents[firstArrayIndex];
+            firstArrayIndex++;
+        } else {
+            helpArray[helpArrayIndex] = allStudents[secondArrayIndex];
+            secondArrayIndex++;
+        }
+        helpArrayIndex++;
     }
+
+    while(firstArrayIndex <= firstEnd) {
+        helpArray[helpArrayIndex] = allStudents[firstArrayIndex];
+        firstArrayIndex++;
+        helpArrayIndex++;
+    }
+
+    while(secondArrayIndex <= secondEnd) {
+        helpArray[helpArrayIndex] = allStudents[secondArrayIndex];
+        secondArrayIndex++;
+        helpArrayIndex++;
+    }
+
+    for(int i = 0; i <= helpArrayIndex ;i++){
+        allStudents[firstStart + i] = helpArray[i];
+    }
+}
+
+/// Merge sort students by their grades
+/// \param lowIndex         Low index
+/// \param highIndex        High index
+void MergeSortStudents(int lowIndex, int highIndex) {
+    if(lowIndex >= highIndex) {
+        return;
+    }
+    int middleIndex = (lowIndex + highIndex) / 2;
+    MergeSortStudents(lowIndex, middleIndex);
+    MergeSortStudents(middleIndex + 1, highIndex);
+    MergeFunction(lowIndex, middleIndex, middleIndex + 1, highIndex);
+}
+
+/// Swap two students values
+/// \param student1         First student pointer
+/// \param student2         Second student pointer
+void SwapStudents(Student *student1, Student *student2) {
+    Student helpStr = *student1;
+    *student1 = *student2;
+    *student2 = helpStr;
+}
+
+/// Get divider for quick sort
+/// \param lowIndex         Low index
+/// \param highIndex        High index
+/// \return
+int GetDivider(int lowIndex, int highIndex) {
+    char *pivot = allStudents[highIndex].name;
+    int smallestElementIndex = lowIndex - 1;
+    for (int i = lowIndex; i <= highIndex; i++) {
+        if (pivot > allStudents[i].name) {
+            smallestElementIndex++;
+            SwapStudents(&allStudents[smallestElementIndex], &allStudents[i]);
+        }
+    }
+    SwapStudents(&allStudents[smallestElementIndex], &allStudents[highIndex]);
+    return smallestElementIndex + 1;
+}
+
+/// Quick sort students by their name
+/// \param lowIndex         Low index
+/// \param highIndex        High index
+void QuickSortStudents(int lowIndex, int highIndex) {
+    if (highIndex > lowIndex) {
+        int divider = GetDivider(lowIndex, highIndex);
+        QuickSortStudents(lowIndex, divider - 1);
+        QuickSortStudents(divider + 1, highIndex);
+    }
+}
+
+///
+/// \return
+int merge() {
+    GetStudentsInputFromUser();
+    MergeSortStudents(0, studentsCount);
     return 0;
 }
+
+///
+int quick() {
+    GetStudentsInputFromUser();
+    QuickSortStudents(0, studentsCount - 1);
+    return 0;
+}
+
