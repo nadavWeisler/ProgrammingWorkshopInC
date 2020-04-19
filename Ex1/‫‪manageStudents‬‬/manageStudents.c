@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #define MAX_INPUT_LINE_LENGTH 60
+#define MAX_BEST_STUDENT_TEXT_LENGTH 90
 #define MAX_STUDENTS 5500
 
 #define ID_LENGTH 10
@@ -364,7 +365,7 @@ void printBestStudent()
     int index = getBestStudent();
     if (index > -1)
     {
-        char studentText[MAX_INPUT_LINE_LENGTH];
+        char studentText[MAX_BEST_STUDENT_TEXT_LENGTH];
         sprintf(studentText, "%s %s,%s,%d,%d,%s,%s", BEST_STUDENT_TEXT,
                 allStudents[index].id, allStudents[index].name,
                 allStudents[index].grade, allStudents[index].age,
@@ -557,7 +558,7 @@ void getStudentsAndPrintBest()
  */
 void mergeTwoStudentsSubArray(int firstStart, int firstEnd, int secondStart, int secondEnd)
 {
-    Student helpArray[studentsCount];
+    Student helpArray[MAX_STUDENTS];
     int firstArrayIndex = firstStart;
     int secondArrayIndex = secondStart;
     int helpArrayIndex = 0;
