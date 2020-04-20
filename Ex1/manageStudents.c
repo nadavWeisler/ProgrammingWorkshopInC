@@ -3,11 +3,17 @@
 #include <stdlib.h>
 
 #define MAX_INPUT_LINE_LENGTH 60
-#define MAX_BEST_STUDENT_TEXT_LENGTH 90
 #define MAX_STUDENTS 5500
+#define MAX_PRINT_LENGTH 90
 
 #define ID_LENGTH 10
 #define FIELD_SIZE 43
+#define MIN_AGE 18
+#define MAX_AGE 120
+#define MIN_GRADE 0
+#define MAX_GRADE 100
+#define INVALID_VALUE_FLOAT -1.0
+#define INVALID_VALUE_INT -1
 
 #define TRUE 0
 #define FALSE 1
@@ -60,7 +66,6 @@ char PARAMS_STRING[6][7] = {"Id", "Name", "Grade", "Age", "Country", "City"};
 int studentsCount = 0;
 Student allStudents[MAX_STUDENTS];
 
-
 /**
  * Generate input error messages
  * @param param         Params
@@ -69,7 +74,7 @@ Student allStudents[MAX_STUDENTS];
  */
 void generateInputError(char *param, int line, char *msg)
 {
-    snprintf(msg, MAX_INPUT_LINE_LENGTH, "%s %s %s %s %d\n",
+    snprintf(msg, MAX_INPUT_LINE_LENGTH, "%s %s %s %s %d",
              START_ERROR_MSG, INVALID_ERROR, param, IN_LINE, line);
 }
 
@@ -79,7 +84,7 @@ void generateInputError(char *param, int line, char *msg)
  * @param length            Param length
  * @return                  0 if int, 1 otherwise
  */
-int stringIsInt(char *param, int length)
+int stringIsInt(const char *param, int length)
 {
     for (int i = 0; i < length; i++)
     {
@@ -171,7 +176,7 @@ int getStringLength(char *str, int maxSize)
  */
 int validateId(char *param)
 {
-    if (getStringLength(param, FIELD_SIZE) != 10)
+    if (getStringLength(param, FIELD_SIZE) != ID_LENGTH)
     {
         return FALSE;
     }
@@ -181,7 +186,6 @@ int validateId(char *param)
     }
     return TRUE;
 }
-
 
 /**
  * Validate name param
@@ -193,7 +197,6 @@ int validateName(char *param)
     return validateString(param, FIELD_SIZE);
 }
 
-
 /**
  * Validate age param
  * @param param     Param to check
@@ -201,7 +204,7 @@ int validateName(char *param)
  */
 int validateAge(char *param)
 {
-    return validateNumber(param, 18, 120);
+    return validateNumber(param, MIN_AGE, MAX_AGE);
 }
 
 /**
@@ -211,7 +214,7 @@ int validateAge(char *param)
  */
 int validateGrade(char *param)
 {
-    return validateNumber(param, 0, 100);
+    return validateNumber(param, MIN_GRADE, MAX_GRADE);
 }
 
 /**
@@ -341,8 +344,8 @@ void addParamToStudent(Student *student, char *paramVal, int paramType)
  */
 int getBestStudent()
 {
-    float bestValue = -1.0;
-    int index = -1;
+    float bestValue = INVALID_VALUE_FLOAT;
+    int index = INVALID_VALUE_INT;
     for (int i = 0; i < studentsCount; i++)
     {
         float grade = (float) allStudents[i].grade;
@@ -356,6 +359,14 @@ int getBestStudent()
     return index;
 }
 
+void getStudentText(char *str, int index)
+{
+    sprintf(str, "%s,%s,%d,%d,%s,%s",
+            allStudents[index].id, allStudents[index].name,
+            allStudents[index].grade, allStudents[index].age,
+            allStudents[index].country, allStudents[index].city);
+
+}
 
 /**
  *  Print best student
@@ -363,17 +374,26 @@ int getBestStudent()
 void printBestStudent()
 {
     int index = getBestStudent();
-    if (index > -1)
+    if (index > INVALID_VALUE_INT)
     {
-        char studentText[MAX_BEST_STUDENT_TEXT_LENGTH];
-        sprintf(studentText, "%s %s,%s,%d,%d,%s,%s", BEST_STUDENT_TEXT,
-                allStudents[index].id, allStudents[index].name,
-                allStudents[index].grade, allStudents[index].age,
-                allStudents[index].country, allStudents[index].city);
-        fputs(studentText, stdout);
+        char print[MAX_PRINT_LENGTH];
+        getStudentText(print, index);
+        printf("%s %s %c", BEST_STUDENT_TEXT, print, NEW_LINE);
     }
 }
 
+/**
+ * Print all students to stdout
+ */
+void printAllStudents()
+{
+    for (int i = 0; i < studentsCount; i++)
+    {
+        char print[MAX_PRINT_LENGTH];
+        getStudentText(print, i);
+        printf("%s %c", print, NEW_LINE);
+    }
+}
 
 /**
  * Update fields to existing student
@@ -394,7 +414,6 @@ int updateFieldsInStudent(int paramCount, char *field, Student *newStudent)
         return FALSE;
     }
 }
-
 
 /**
  * Generate input line to student
@@ -518,7 +537,7 @@ void getStudentsInputFromUser()
 {
     char inputVal[MAX_INPUT_LINE_LENGTH];
     int lineCount = 0;
-    printf("%s\n", ASK_INPUT);
+    printf("%s%c", ASK_INPUT, NEW_LINE);
     fgets(inputVal, MAX_INPUT_LINE_LENGTH, stdin);
     while (ifStop(inputVal) == FALSE)
     {
@@ -531,23 +550,13 @@ void getStudentsInputFromUser()
         }
         else
         {
-            fputs(errorMsg, stdout);
+            printf("%s%c", errorMsg, NEW_LINE);
         }
         lineCount++;
-        printf("%s\n", ASK_INPUT);
+        printf("%s%c", ASK_INPUT, NEW_LINE);
         fgets(inputVal, MAX_INPUT_LINE_LENGTH, stdin);
     }
 }
-
-/**
- * Get students from user and print the best one
- */
-void getStudentsAndPrintBest()
-{
-    getStudentsInputFromUser();
-    printBestStudent();
-}
-
 
 /**
  * Merge between 2 sub arrays of students
@@ -556,7 +565,7 @@ void getStudentsAndPrintBest()
  * @param secondStart   Second sub array start index
  * @param secondEnd     Second sub array end index
  */
-void mergeTwoStudentsSubArray(int firstStart, int firstEnd, int secondStart, int secondEnd)
+void mergeTwoStudentsSubArrays(int firstStart, int firstEnd, int secondStart, int secondEnd)
 {
     Student helpArray[MAX_STUDENTS];
     int firstArrayIndex = firstStart;
@@ -565,7 +574,7 @@ void mergeTwoStudentsSubArray(int firstStart, int firstEnd, int secondStart, int
 
     while (firstArrayIndex <= firstEnd && secondArrayIndex <= secondEnd)
     {
-        if (allStudents[firstArrayIndex].grade >= allStudents[secondArrayIndex].grade)
+        if (allStudents[firstArrayIndex].grade <= allStudents[secondArrayIndex].grade)
         {
             helpArray[helpArrayIndex] = allStudents[firstArrayIndex];
             firstArrayIndex++;
@@ -592,7 +601,7 @@ void mergeTwoStudentsSubArray(int firstStart, int firstEnd, int secondStart, int
         helpArrayIndex++;
     }
 
-    for (int i = 0; i <= helpArrayIndex; i++)
+    for (int i = 0; i < helpArrayIndex; i++)
     {
         allStudents[firstStart + i] = helpArray[i];
     }
@@ -612,7 +621,7 @@ void mergeSortStudentsByGrades(int lowIndex, int highIndex)
     int middleIndex = (lowIndex + highIndex) / 2;
     mergeSortStudentsByGrades(lowIndex, middleIndex);
     mergeSortStudentsByGrades(middleIndex + 1, highIndex);
-    mergeTwoStudentsSubArray(lowIndex, middleIndex, middleIndex + 1, highIndex);
+    mergeTwoStudentsSubArrays(lowIndex, middleIndex, middleIndex + 1, highIndex);
 }
 
 /**
@@ -626,7 +635,6 @@ void swapStudents(Student *student1, Student *student2)
     *student1 = *student2;
     *student2 = helpStr;
 }
-
 
 /**
  * Get divider for GetStudentsAndQuickSortByNames sort
@@ -666,25 +674,6 @@ void quickSortStudents(int lowIndex, int highIndex)
 }
 
 /**
- * Get students from users and merge sort them by their grades
- */
-void getStudentsAndMergeSortByGrades()
-{
-    getStudentsInputFromUser();
-    mergeSortStudentsByGrades(0, studentsCount);
-}
-
-
-/**
- * Get students from users and quick sort them by their names
- */
-void getStudentsAndQuickSortByNames()
-{
-    getStudentsInputFromUser();
-    quickSortStudents(0, studentsCount - 1);
-}
-
-/**
  * Main function
  * @param argc      Arguments count
  * @param argv      Arguments array
@@ -694,26 +683,43 @@ int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        printf("%s\n", USAGE_ERROR);
+        printf("%s%c", USAGE_ERROR, NEW_LINE);
         return FALSE;
     }
     else
     {
-        if (ifEqual(argv[1], BEST, BEST_LENGTH))
+        if (ifEqual(argv[1], BEST, BEST_LENGTH) == TRUE)
         {
-            getStudentsAndPrintBest();
+            getStudentsInputFromUser();
+            if (studentsCount < 1)
+            {
+                return FALSE;
+            }
+            printBestStudent();
         }
-        else if (ifEqual(argv[1], MERGE, MERGE_LENGTH))
+        else if (ifEqual(argv[1], MERGE, MERGE_LENGTH) == TRUE)
         {
-            getStudentsAndMergeSortByGrades();
+            getStudentsInputFromUser();
+            if (studentsCount < 1)
+            {
+                return FALSE;
+            }
+            mergeSortStudentsByGrades(0, studentsCount - 1);
+            printAllStudents();
         }
-        else if (ifEqual(argv[1], QUICK, QUICK_LENGTH))
+        else if (ifEqual(argv[1], QUICK, QUICK_LENGTH) == TRUE)
         {
-            getStudentsAndQuickSortByNames();
+            getStudentsInputFromUser();
+            if (studentsCount < 1)
+            {
+                return FALSE;
+            }
+            quickSortStudents(0, studentsCount - 1);
+            printAllStudents();
         }
         else
         {
-            printf("%s\n", USAGE_ERROR);
+            printf("%s%c", USAGE_ERROR, NEW_LINE);
             return FALSE;
         }
     }
