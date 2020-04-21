@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex1/manageStudents.c
+stdio.h
+-
+ctype.h
+-
+stdlib.h
+-
+
