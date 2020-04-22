@@ -14,15 +14,16 @@ typedef struct Test
 	int exitCode;
 } Test;
 
-Test tests[10] = {{ "general", "best", "./tests/test1.txt", "./tests/expected1.txt", 0 },
-				  { "iD", "best", "./tests/test2.txt", "./tests/expected2.txt", 0 },
-				  { "name", "best", "./tests/test3.txt", "./tests/expected3.txt", 0 },
-				  { "grade", "best", "./tests/test4.txt", "./tests/expected4.txt", 0 },
-				  { "age", "best", "./tests/test5.txt", "./tests/expected5.txt", 0 },
-				  { "country", "best", "./tests/test6.txt", "./tests/expected6.txt", 0 },
-				  { "city", "best", "./tests/test7.txt", "./tests/expected7.txt", 0 },
-				  { "EOF handling", "best", "./tests/eofTest.txt", "./tests/eofExpected.txt", 1 },
-				  { "maximum size", "best", "./tests/testMaxSize.txt", "./tests/expectedMaxSize.txt", 0 },
+Test tests[10] = {
+	{ "general", "best", "./tests/test1.txt", "./tests/expected1.txt", 0 },
+//	{ "iD", "best", "./tests/test2.txt", "./tests/expected2.txt", 0 },
+	{ "name", "best", "./tests/test3.txt", "./tests/expected3.txt", 0 },
+	{ "grade", "best", "./tests/test4.txt", "./tests/expected4.txt", 0 },
+	{ "age", "best", "./tests/test5.txt", "./tests/expected5.txt", 0 },
+	{ "country", "best", "./tests/test6.txt", "./tests/expected6.txt", 0 },
+	{ "city", "best", "./tests/test7.txt", "./tests/expected7.txt", 0 },
+	{ "EOF handling", "best", "./tests/eofTest.txt", "./tests/eofExpected.txt", 1 },
+	{ "maximum size", "best", "./tests/testMaxSize.txt", "./tests/expectedMaxSize.txt", 0 },
 };
 int testsLen = 9;
 
