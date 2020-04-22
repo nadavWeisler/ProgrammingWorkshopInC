@@ -14,20 +14,20 @@ typedef struct Test
 	int exitCode;
 } Test;
 
-Test tests[10] = {
-	{ "general", "best", "./tests/test1.txt", "./tests/expected1.txt", 0 },
-//	{ "iD", "best", "./tests/test2.txt", "./tests/expected2.txt", 0 },
-	{ "name", "best", "./tests/test3.txt", "./tests/expected3.txt", 0 },
-	{ "grade", "best", "./tests/test4.txt", "./tests/expected4.txt", 0 },
-	{ "age", "best", "./tests/test5.txt", "./tests/expected5.txt", 0 },
-	{ "country", "best", "./tests/test6.txt", "./tests/expected6.txt", 0 },
-	{ "city", "best", "./tests/test7.txt", "./tests/expected7.txt", 0 },
-	{ "EOF handling", "best", "./tests/eofTest.txt", "./tests/eofExpected.txt", 1 },
-	{ "maximum size", "best", "./tests/testMaxSize.txt", "./tests/expectedMaxSize.txt", 0 },
-};
+Test tests[10] = {{"general", "best", "./tests/test1.txt", "./tests/expected1.txt", 0},
+				  {"iD", "best", "./tests/test2.txt", "./tests/expected2.txt", 0},
+				  {"name", "best", "./tests/test3.txt", "./tests/expected3.txt", 0},
+				  {"grade", "best", "./tests/test4.txt", "./tests/expected4.txt", 0},
+				  {"age", "best", "./tests/test5.txt", "./tests/expected5.txt", 0},
+				  {"country", "best", "./tests/test6.txt", "./tests/expected6.txt", 0},
+				  {"city", "best","./tests/test7.txt", "./tests/expected7.txt", 0},
+				  {"EOF handling", "best", "./tests/eofTest.txt", "./tests/eofExpected.txt", 1},
+				  {"maximum size", "best", "./tests/testMaxSize.txt", "./tests/expectedMaxSize.txt", 0},
+				};
 int testsLen = 9;
 
-int main(int argc, char* args[])
+
+int main(int argc, char *args[])
 {
 	if (argc == 2 && strcmp(args[1], "school") == 0)
 	{
@@ -68,8 +68,7 @@ int main(int argc, char* args[])
 						time_taken = (end.tv_sec - start.tv_sec) * 1e9;
 						time_taken = (time_taken + (end.tv_nsec - start.tv_nsec)) * 1e-9;
 						printf("\nThe test took %f seconds to execute \n", time_taken);
-						fprintf(stderr,
-							"\nMake sure your execution time isn't significantly longer than the school solution\n for this test. (~6.5 seconds *ON THE UNIVERSITY'S COMPUTERS*)\n");
+						fprintf(stderr, "\nMake sure your execution time isn't significantly longer than the school solution\n for this test. (~6.5 seconds *ON THE UNIVERSITY'S COMPUTERS*)\n");
 					}
 				}
 			}
@@ -99,7 +98,7 @@ int bestTest(int batchSize)
 			success = 0;
 			break;
 		}
-		doProgress("Testing", i + 1, RERUNS);
+		doProgress("Testing", i+1, RERUNS);
 	}
 
 	if (success)
@@ -110,12 +109,15 @@ int bestTest(int batchSize)
 	return 0;
 }
 
-int sortingTest(char* command, int batchSize)
+
+int sortingTest(char *command, int batchSize)
 {
 	int success = 1;
 	for (int i = 0; i < RERUNS; i++)
 	{
 		createSortingTest(batchSize);
+		printf("%s\n", command);
+		printf("%s\n", AUTOMATED_TEST);
 		if (runTest(AUTOMATED_TEST, command, OUTPUT) != 0)
 		{
 			fprintf(stderr, "Failed running the compiled file, exit code was 1.\n");
@@ -143,8 +145,8 @@ int sortingTest(char* command, int batchSize)
 				break;
 			}
 		}
-		doProgress("Testing", i + 1, RERUNS);
-	}
+		doProgress("Testing", i+1, RERUNS);
+		}
 
 	if (success)
 	{
@@ -184,10 +186,7 @@ int inputTesting()
 			}
 			else
 			{
-				fprintf(stderr,
-					"Failed test %d, you can view the 'output and '%s' files to compare the two.\n",
-					i + 1,
-					test.expected);
+				fprintf(stderr, "Failed test %d, you can view the 'output and '%s' files to compare the two.\n", i+1, test.expected);
 				openDebugFiles(tests[i].file, tests[i].expected, OUTPUT);
 				success = 0;
 				break;
@@ -214,7 +213,7 @@ int usageTest()
 		return 0;
 	}
 
-	FILE* output = fopen(OUTPUT, "r");
+	FILE *output = fopen(OUTPUT, "r");
 	char line[LINE_SIZE];
 	fgets(line, LINE_SIZE, output);
 	fclose(output);

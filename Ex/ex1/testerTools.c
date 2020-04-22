@@ -63,7 +63,6 @@ int runTest(char *testName, char *command, char *output)
 	remove(output);
 	char *cmd = (char*)malloc(150 * sizeof(char));
 	sprintf(cmd, "%s %s <%s >%s", _NAME, command, testName, output);
-	printf("%s\n", cmd);
 	int exitCode = system(cmd);
 	free(cmd);
 	return WEXITSTATUS(exitCode);

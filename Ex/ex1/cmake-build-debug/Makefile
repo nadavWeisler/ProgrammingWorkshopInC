@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named ex1
+# Target rules for targets named ex
 
 # Build rule for target.
-ex1: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ex1
-.PHONY : ex1
+ex: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ex
+.PHONY : ex
 
 # fast build rule for target.
-ex1/fast:
-	$(MAKE) -f CMakeFiles/ex1.dir/build.make CMakeFiles/ex1.dir/build
-.PHONY : ex1/fast
+ex/fast:
+	$(MAKE) -f CMakeFiles/ex.dir/build.make CMakeFiles/ex.dir/build
+.PHONY : ex/fast
 
 manageStudents.o: manageStudents.c.o
 
@@ -129,7 +129,7 @@ manageStudents.o: manageStudents.c.o
 
 # target to build an object file
 manageStudents.c.o:
-	$(MAKE) -f CMakeFiles/ex1.dir/build.make CMakeFiles/ex1.dir/manageStudents.c.o
+	$(MAKE) -f CMakeFiles/ex.dir/build.make CMakeFiles/ex.dir/manageStudents.c.o
 .PHONY : manageStudents.c.o
 
 manageStudents.i: manageStudents.c.i
@@ -138,7 +138,7 @@ manageStudents.i: manageStudents.c.i
 
 # target to preprocess a source file
 manageStudents.c.i:
-	$(MAKE) -f CMakeFiles/ex1.dir/build.make CMakeFiles/ex1.dir/manageStudents.c.i
+	$(MAKE) -f CMakeFiles/ex.dir/build.make CMakeFiles/ex.dir/manageStudents.c.i
 .PHONY : manageStudents.c.i
 
 manageStudents.s: manageStudents.c.s
@@ -147,7 +147,7 @@ manageStudents.s: manageStudents.c.s
 
 # target to generate assembly for a file
 manageStudents.c.s:
-	$(MAKE) -f CMakeFiles/ex1.dir/build.make CMakeFiles/ex1.dir/manageStudents.c.s
+	$(MAKE) -f CMakeFiles/ex.dir/build.make CMakeFiles/ex.dir/manageStudents.c.s
 .PHONY : manageStudents.c.s
 
 # Help Target
@@ -157,7 +157,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... ex1"
+	@echo "... ex"
 	@echo "... edit_cache"
 	@echo "... manageStudents.o"
 	@echo "... manageStudents.i"

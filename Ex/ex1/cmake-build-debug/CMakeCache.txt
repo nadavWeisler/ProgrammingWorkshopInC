@@ -130,7 +130,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=ex1
+CMAKE_PROJECT_NAME:STATIC=ex
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib.exe
@@ -219,10 +219,10 @@ ProcessorCount_cmd_nproc:FILEPATH=/usr/bin/nproc.exe
 ProcessorCount_cmd_sysctl:FILEPATH=ProcessorCount_cmd_sysctl-NOTFOUND
 
 //Value Computed by CMake
-ex1_BINARY_DIR:STATIC=/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex1/cmake-build-debug
+ex_BINARY_DIR:STATIC=/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex1/cmake-build-debug
 
 //Value Computed by CMake
-ex1_SOURCE_DIR:STATIC=/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex1
+ex_SOURCE_DIR:STATIC=/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex1
 
 
 ########################

@@ -3,11 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_INPUT_LINE_LENGTH 60
+#define MAX_INPUT_LINE_LENGTH 61
 #define MAX_STUDENTS 5500
 #define PARAM_COUNT 6
 
-#define ID_LENGTH 10
 #define FIELD_SIZE 43
 #define MIN_AGE 18
 #define MAX_AGE 120
@@ -26,20 +25,23 @@
 #define COUNTRY_PARAM 4
 #define CITY_PARAM 5
 
-#define WHITE_SPACE ' '
 #define COMMA ","
 #define EMPTY_CHAR '\0'
 #define HYPHEN '-'
-#define NEW_LINE "\n"
 
 #define BEST_STUDENT_TEST "best student info is:"
 #define STOP "q\n"
-#define START_ERROR_MSG "ERROR:"
-#define INVALID_ERROR "Invalid value for"
-#define IN_LINE "in line"
-#define INVALID_PARAM_COUNT "invalid param count"
-#define ASK_INPUT "Enter student info. To exit press q, then enter‬‬"
-#define USAGE_ERROR "USAGE: You should write best, merge or quick, come on :("
+#define IN_LINE "in line "
+#define INVALID_NAME_PARAM "ERROR: Invalid name.\n"
+#define INVALID_ID_PARAM "ERROR: Invalid ID.\n"
+#define INVALID_AGE_PARAM "ERROR: Invalid age.\n"
+#define INVALID_GRADE_PARAM "ERROR: Invalid grade.\n"
+#define INVALID_COUNTRY_PARAM "ERROR: Invalid country.\n"
+#define INVALID_CITY_PARAM "ERROR: Invalid city.\n"
+#define INVALID_PARAM_COUNT "ERROR: Invalid param count.\n"
+#define ASK_INPUT "Enter student info. To exit press q, then enter\n"
+#define USAGE_ERROR "USAGE: You should write best, merge or quick, come on :(\n"
+#define INVALID_INPUT "ERROR: Invalid input\n"
 
 #define BEST "best"
 #define MERGE "merge"
@@ -50,7 +52,7 @@
  */
 struct Student
 {
-	char id[ID_LENGTH + 1];
+	long id;
 	char name[FIELD_SIZE];
 	int grade;
 	int age;
@@ -62,7 +64,6 @@ typedef struct Student Student;
 
 int studentsCount = 0;
 Student allStudents[MAX_STUDENTS];
-char PARAMS_STRING[6][7] = { "Id", "Name", "Grade", "Age", "Country", "City" };
 
 /**
  * Validate that String is int
@@ -72,6 +73,10 @@ char PARAMS_STRING[6][7] = { "Id", "Name", "Grade", "Age", "Country", "City" };
  */
 int stringIsInt(char* param, int length)
 {
+	if (strlen(param) == 0)
+	{
+		return FALSE;
+	}
 	for (int i = 0; i < length; i++)
 	{
 		if (param[i] == EMPTY_CHAR)
@@ -99,14 +104,15 @@ int stringIsInt(char* param, int length)
  * @param maxValue          Maximum Value
  * @return                  Return 0 if true, 1 otherwise
  */
-int validateNumber(char* param, int minValue, int maxValue)
+int validateNumber(char* param, long minValue, long maxValue)
 {
 	if (stringIsInt(param, FIELD_SIZE) == FALSE)
 	{
 		return FALSE;
 	}
-	int intParam = atoi(param);
-	if (intParam > maxValue || intParam < minValue)
+	long longParam;
+	sscanf(param, "%ld", &longParam);
+	if (longParam > maxValue || longParam < minValue)
 	{
 		return FALSE;
 	}
@@ -121,6 +127,10 @@ int validateNumber(char* param, int minValue, int maxValue)
  */
 int validateString(char* param, int length)
 {
+	if (strcmp(param, "\n") == TRUE)
+	{
+		return FALSE;
+	}
 	for (int i = 0; i < length; i++)
 	{
 		unsigned char current = (unsigned char)param[i];
@@ -139,94 +149,117 @@ int validateString(char* param, int length)
 }
 
 /**
- * Get string length
- * @param str           String reference
- * @param maxSize       Max string size
- * @return              String length
- */
-int getStringLength(char* str, int maxSize)
-{
-	int result = 0;
-	for (int i = 0; i < maxSize; i++)
-	{
-		if (str[i] == EMPTY_CHAR || str[i] == '\n')
-		{
-			break;
-		}
-		else
-		{
-			result++;
-		}
-	}
-	return result;
-}
-
-/**
  * Validate ID
- * @param param     Param to check
- * @return          Return 0 if true, 1 otherwise
+ * @param param     	Param to check
+ * @param lineNum		Line number
+ * @return         		Return 0 if true, 1 otherwise
  */
-int validateId(char* param)
+int validateId(char* param, int lineNum)
 {
-	if (getStringLength(param, FIELD_SIZE) != ID_LENGTH || stringIsInt(param, FIELD_SIZE) == FALSE)
+	if (validateNumber(param, 999999999, 10000000000) == TRUE)
 	{
+		return TRUE;
+	}
+	else
+	{
+		printf("%s"IN_LINE"%d\n", INVALID_ID_PARAM, lineNum);
 		return FALSE;
 	}
-	if (param[0] == '0')
-	{
-		return FALSE;
-	}
-	return TRUE;
 }
 
 /**
  * Validate name param
  * @param param         Param to check
+ * @param lineNum		Line number
  * @return              Return 0 if true, 1 otherwise
  */
-int validateName(char* param)
+int validateName(char* param, int lineNum)
 {
-	return validateString(param, FIELD_SIZE);
+	if (validateString(param, FIELD_SIZE) == TRUE)
+	{
+		return TRUE;
+	}
+	else
+	{
+		printf("%s"IN_LINE"%d\n", INVALID_NAME_PARAM, lineNum);
+		return FALSE;
+	}
 }
 
 /**
  * Validate age param
  * @param param     Param to check
- * @return           Return 0 if true, 1 otherwise
+ * @param lineNum	Line number
+ * @return          Return 0 if true, 1 otherwise
  */
-int validateAge(char* param)
+int validateAge(char* param, int lineNum)
 {
-	return validateNumber(param, MIN_AGE, MAX_AGE);
+	if (validateNumber(param, MIN_AGE, MAX_AGE) == TRUE)
+	{
+		return TRUE;
+	}
+	else
+	{
+		printf("%s"IN_LINE"%d\n", INVALID_AGE_PARAM, lineNum);
+		return FALSE;
+	}
 }
 
 /**
  * Validate grade param
  * @param param     Param to check
- * @return           Return 0 if true, 1 otherwise
+ * @param lineNum   Line to check
+ * @return          Return 0 if true, 1 otherwise
  */
-int validateGrade(char* param)
+int validateGrade(char* param, int lineNum)
 {
-	return validateNumber(param, MIN_GRADE, MAX_GRADE);
+	if (validateNumber(param, MIN_GRADE, MAX_GRADE) == TRUE)
+	{
+		return TRUE;
+	}
+	else
+	{
+		printf("%s"IN_LINE"%d\n", INVALID_GRADE_PARAM, lineNum);
+		return FALSE;
+	}
 }
 
 /**
  * Validate city param
  * @param param     Param to check
- * @return           Return 0 if true, 1 otherwise
+ * @param lineNum 	Line number
+ * @return          Return 0 if true, 1 otherwise
  */
-int validateCity(char* param)
+int validateCity(char* param, int lineNum)
 {
-	return validateString(param, FIELD_SIZE);
+	if (validateString(param, FIELD_SIZE) == TRUE)
+	{
+		return TRUE;
+	}
+	else
+	{
+		printf("%s"IN_LINE"%d\n", INVALID_CITY_PARAM, lineNum);
+		return FALSE;
+	}
 }
 
 /**
  * Validate country param
  * @param param     Param to check
- * @return           Return 0 if true, 1 otherwise
+ * @param lineNum	Line number
+ * @return          Return 0 if true, 1 otherwise
  */
-int validateCountry(char* param)
+int validateCountry(char* param, int lineNum)
 {
-	return validateString(param, FIELD_SIZE);
+	if (validateString(param, FIELD_SIZE) == TRUE)
+	{
+		return TRUE;
+	}
+	else
+	{
+		printf("%s"IN_LINE"%d\n", INVALID_COUNTRY_PARAM, lineNum);
+		return FALSE;
+	}
 }
 
 /**
@@ -235,37 +268,24 @@ int validateCountry(char* param)
  * @param paramType    Param type
  * @return             Return 0 if true, 1 otherwise
  */
-int validateParam(char* param, int paramType)
+int validateParam(char* param, int paramType, int lineNum)
 {
 	switch (paramType)
 	{
 		case ID_PARAM:
-			return validateId(param);
+			return validateId(param, lineNum);
 		case NAME_PARAM:
-			return validateName(param);
+			return validateName(param, lineNum);
 		case AGE_PARAM:
-			return validateAge(param);
+			return validateAge(param, lineNum);
 		case GRADE_PARAM:
-			return validateGrade(param);
+			return validateGrade(param, lineNum);
 		case COUNTRY_PARAM:
-			return validateCountry(param);
+			return validateCountry(param, lineNum);
 		case CITY_PARAM:
-			return validateCity(param);
+			return validateCity(param, lineNum);
 		default:
 			return FALSE;
-	}
-}
-
-/**
- * Reset string
- * @param str       Char array
- * @param length    Array length
- */
-void resetString(char* str, int length)
-{
-	for (int i = 0; i < length; i++)
-	{
-		str[i] = EMPTY_CHAR;
 	}
 }
 
@@ -278,10 +298,12 @@ void resetString(char* str, int length)
 void addParamToStudent(Student* student, char* paramVal, int paramType)
 {
 	int intParamVal = 0;
+	long longParamVal = 0;
 	switch (paramType)
 	{
 		case ID_PARAM:
-			strcpy(student->id, paramVal);
+			sscanf(paramVal, "%ld", &longParamVal);
+			student->id = longParamVal;
 			break;
 		case NAME_PARAM:
 			strcpy(student->name, paramVal);
@@ -298,13 +320,14 @@ void addParamToStudent(Student* student, char* paramVal, int paramType)
 			strcpy(student->country, paramVal);
 			break;
 		case CITY_PARAM:
+			paramVal[strlen(paramVal) - 1] = EMPTY_CHAR;
 			strcpy(student->city, paramVal);
 			break;
 	}
 }
 
 /**
- * Get best student index from allstudents array
+ * Get best student index from students array
  * @return      Best student index
  */
 int getBestStudent()
@@ -332,10 +355,10 @@ void printBestStudent()
 	int index = getBestStudent();
 	if (index > INVALID_VALUE_INT)
 	{
-		printf("%s %s,%s,%d,%d,%s,%s%s", BEST_STUDENT_TEST,
+		printf("%s %ld,%s,%d,%d,%s,%s\n", BEST_STUDENT_TEST,
 			allStudents[index].id, allStudents[index].name,
 			allStudents[index].grade, allStudents[index].age,
-			allStudents[index].country, allStudents[index].city, NEW_LINE);
+			allStudents[index].country, allStudents[index].city);
 	}
 }
 
@@ -346,10 +369,10 @@ void printAllStudents()
 {
 	for (int i = 0; i < studentsCount; i++)
 	{
-		printf("%s,%s,%d,%d,%s,%s%s",
+		printf("%ld,%s,%d,%d,%s,%s\n",
 			allStudents[i].id, allStudents[i].name,
 			allStudents[i].grade, allStudents[i].age,
-			allStudents[i].country, allStudents[i].city, NEW_LINE);
+			allStudents[i].country, allStudents[i].city);
 	}
 }
 
@@ -360,9 +383,9 @@ void printAllStudents()
  * @param newStudent        Student pointer
  * @return                  0 if worked, 1 otherwise
  */
-int updateFieldsInStudent(int paramCount, char* field, Student* newStudent)
+int updateFieldsInStudent(int paramCount, char* field, Student* newStudent, int lineNum)
 {
-	if (validateParam(field, paramCount) == TRUE)
+	if (validateParam(field, paramCount, lineNum) == TRUE)
 	{
 		addParamToStudent(newStudent, field, paramCount);
 		return TRUE;
@@ -384,7 +407,6 @@ int updateFieldsInStudent(int paramCount, char* field, Student* newStudent)
  */
 int inputLineToStudent(Student* newStudent, char* inputLine, int lineCount)
 {
-	int returnValue = TRUE;
 	char* newField;
 	newField = strtok(inputLine, COMMA);
 	int paramIndex = 0;
@@ -403,37 +425,34 @@ int inputLineToStudent(Student* newStudent, char* inputLine, int lineCount)
 
 	if (paramIndex != PARAM_COUNT)
 	{
-		printf("%s %s%s", START_ERROR_MSG, INVALID_PARAM_COUNT, NEW_LINE);
-		printf("%s %d%s", IN_LINE, lineCount, NEW_LINE);
-		returnValue = FALSE;
+		printf("%s"IN_LINE"%d\n", INVALID_PARAM_COUNT, lineCount);
+		return FALSE;
 	}
 	else
 	{
 		for (int i = 0; i < PARAM_COUNT; i++)
 		{
-			if (updateFieldsInStudent(i, fields[i], newStudent) == FALSE)
+			if (updateFieldsInStudent(i, fields[i], newStudent, lineCount) == FALSE)
 			{
-				printf("%s %s %s%s", START_ERROR_MSG, INVALID_ERROR, PARAMS_STRING[i], NEW_LINE);
-				printf("%s %d%s", IN_LINE, lineCount, NEW_LINE);
-				returnValue = FALSE;
+				return FALSE;
 			}
 		}
 	}
-
-	return returnValue;
+	return TRUE;
 }
 
 /**
  * Get students input from user
  */
-void getStudentsInputFromUser()
+int getStudentsInputFromUser()
 {
 	char inputVal[MAX_INPUT_LINE_LENGTH];
 	int lineCount = 0;
-	printf("%s%s", ASK_INPUT, NEW_LINE);
+	printf("%s", ASK_INPUT);
 	if (fgets(inputVal, MAX_INPUT_LINE_LENGTH, stdin) == NULL)
 	{
-		strcpy(inputVal, NEW_LINE);
+		printf("%s"IN_LINE"%d\n", INVALID_INPUT, lineCount);
+		return FALSE;
 	}
 	while (strcmp(inputVal, STOP) != TRUE)
 	{
@@ -444,12 +463,14 @@ void getStudentsInputFromUser()
 			studentsCount++;
 		}
 		lineCount++;
-		printf("%s%s", ASK_INPUT, NEW_LINE);
+		printf("%s", ASK_INPUT);
 		if (fgets(inputVal, MAX_INPUT_LINE_LENGTH, stdin) == NULL)
 		{
-			strcpy(inputVal, NEW_LINE);
+			printf("%s"IN_LINE"%d\n", INVALID_INPUT, lineCount);
+			return FALSE;
 		}
 	}
+	return TRUE;
 }
 
 /**
@@ -539,17 +560,17 @@ void swapStudents(Student* student1, Student* student2)
  */
 int getDivider(int lowIndex, int highIndex)
 {
-	char* pivot = allStudents[highIndex].name;
+	Student pivot = allStudents[highIndex];
 	int smallestElementIndex = lowIndex - 1;
-	for (int i = lowIndex; i <= highIndex; i++)
+	for (int i = lowIndex; i <= highIndex - 1; i++)
 	{
-		if (pivot > allStudents[i].name)
+		if (strcmp(allStudents[i].name, pivot.name) < 0)
 		{
 			smallestElementIndex++;
 			swapStudents(&allStudents[smallestElementIndex], &allStudents[i]);
 		}
 	}
-	swapStudents(&allStudents[smallestElementIndex], &allStudents[highIndex]);
+	swapStudents(&allStudents[smallestElementIndex + 1], &allStudents[highIndex]);
 	return smallestElementIndex + 1;
 }
 
@@ -578,43 +599,60 @@ int main(int argc, char* argv[])
 {
 	if (argc != 2)
 	{
-		printf("%s%s", USAGE_ERROR, NEW_LINE);
+		printf("%s", USAGE_ERROR);
 		return FALSE;
 	}
 	else
 	{
 		if (strcmp(argv[1], BEST) == TRUE)
 		{
-			getStudentsInputFromUser();
-			if (studentsCount > 0)
+			if (getStudentsInputFromUser() == TRUE)
 			{
-				printBestStudent();
+				if (studentsCount > 0)
+				{
+					printBestStudent();
+				}
+			}
+			else
+			{
+				return FALSE;
 			}
 		}
 		else if (strcmp(argv[1], MERGE) == TRUE)
 		{
-			getStudentsInputFromUser();
-			if (studentsCount > 0)
+			if (getStudentsInputFromUser() == TRUE)
 			{
-				mergeSortStudentsByGrades(0, studentsCount - 1);
-				printAllStudents();
+				if (studentsCount > 0)
+				{
+					mergeSortStudentsByGrades(0, studentsCount - 1);
+					printAllStudents();
+				}
+			}
+			else
+			{
+				return FALSE;
 			}
 		}
 		else if (strcmp(argv[1], QUICK) == TRUE)
 		{
-			getStudentsInputFromUser();
-			if (studentsCount > 0)
+			if (getStudentsInputFromUser() == TRUE)
 			{
-				quickSortStudents(0, studentsCount - 1);
-				printAllStudents();
+				if (studentsCount > 0)
+				{
+					quickSortStudents(0, studentsCount - 1);
+					printAllStudents();
+				}
+			}
+			else
+			{
+				return FALSE;
 			}
 		}
 		else
 		{
-			printf("%s%s", USAGE_ERROR, NEW_LINE);
+			printf("%s", USAGE_ERROR);
 			return FALSE;
 		}
 	}
 	return TRUE;
 }
-
