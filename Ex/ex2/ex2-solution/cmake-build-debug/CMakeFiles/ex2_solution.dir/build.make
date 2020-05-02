@@ -57,27 +57,27 @@ include CMakeFiles/ex2_solution.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/ex2_solution.dir/flags.make
 
-CMakeFiles/ex2_solution.dir/main.c.o: CMakeFiles/ex2_solution.dir/flags.make
-CMakeFiles/ex2_solution.dir/main.c.o: ../main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/ex2_solution.dir/main.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/ex2_solution.dir/main.c.o   -c /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/main.c
+CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o: CMakeFiles/ex2_solution.dir/flags.make
+CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o: ../RailWayPlanner.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o   -c /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/RailWayPlanner.c
 
-CMakeFiles/ex2_solution.dir/main.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/ex2_solution.dir/main.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/main.c > CMakeFiles/ex2_solution.dir/main.c.i
+CMakeFiles/ex2_solution.dir/RailWayPlanner.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/ex2_solution.dir/RailWayPlanner.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/RailWayPlanner.c > CMakeFiles/ex2_solution.dir/RailWayPlanner.c.i
 
-CMakeFiles/ex2_solution.dir/main.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ex2_solution.dir/main.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/main.c -o CMakeFiles/ex2_solution.dir/main.c.s
+CMakeFiles/ex2_solution.dir/RailWayPlanner.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ex2_solution.dir/RailWayPlanner.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/RailWayPlanner.c -o CMakeFiles/ex2_solution.dir/RailWayPlanner.c.s
 
 # Object files for target ex2_solution
 ex2_solution_OBJECTS = \
-"CMakeFiles/ex2_solution.dir/main.c.o"
+"CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o"
 
 # External object files for target ex2_solution
 ex2_solution_EXTERNAL_OBJECTS =
 
-ex2_solution.exe: CMakeFiles/ex2_solution.dir/main.c.o
+ex2_solution.exe: CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o
 ex2_solution.exe: CMakeFiles/ex2_solution.dir/build.make
 ex2_solution.exe: CMakeFiles/ex2_solution.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ex2_solution.exe"

@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/ex2_solution.dir/main.c.o"
+  "CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o"
   "ex2_solution.exe"
   "ex2_solution.pdb"
   "libex2_solution.dll.a"
