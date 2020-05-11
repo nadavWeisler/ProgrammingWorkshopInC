@@ -1,8 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o"
-  "ex2_solution.exe"
+  "ex2_solution"
   "ex2_solution.pdb"
-  "libex2_solution.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.

@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/RailWayPlanner.c" "/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o"
+  "/mnt/c/Weisler/Study/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/RailWayPlanner.c" "/mnt/c/Weisler/Study/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles/ex2_solution.dir/RailWayPlanner.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

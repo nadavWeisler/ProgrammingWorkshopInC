@@ -277,9 +277,9 @@ void resetRailwayCostMatrix(Direction*** railwaysCostMat)
  */
 int getIndexFromSign(char sign)
 {
-	for(int i = 0; i < railwaySignsCount; i++)
+	for (int i = 0; i < railwaySignsCount; i++)
 	{
-		if(signs[i] == sign)
+		if (signs[i] == sign)
 		{
 			return i;
 		}
@@ -300,12 +300,13 @@ void fillPriceMatrix(Direction*** railwaysCostMat)
 			for (int partIndex = 0; partIndex < partCount; partIndex++)
 			{
 				const RailwayPart addedPart = parts[partIndex];
-				if ((*railwaysCostMat)[lengthIndex][signIndex].right != addedPart.left || addedPart.length > lengthIndex)
+				if ((*railwaysCostMat)[lengthIndex][signIndex].right != addedPart.left
+					|| addedPart.length > lengthIndex)
 				{
 					continue;
 				}
 				int addedPartStartIndex = getIndexFromSign(addedPart.right);
-				if(addedPartStartIndex == -1)
+				if (addedPartStartIndex == -1)
 				{
 					continue;
 				}
@@ -419,7 +420,6 @@ int main(int argc, char* argv[])
 	FILE* input = fopen(argv[1], OPEN_FILE_PERMISSION);
 	if (input == NULL)
 	{
-		fclose(input);
 		writeOutputFile(OUTPUT_FILE_PATH, FILE_DOESNT_EXIST_ERROR, INT_MIN);
 		exitCode = EXIT_FAILURE;
 	}
@@ -441,8 +441,8 @@ int main(int argc, char* argv[])
 			writeOutputFile(OUTPUT_FILE_PATH, INVALID_INPUT_ERROR, INT_MIN);
 			exitCode = EXIT_FAILURE;
 		}
+		fclose(input);
 	}
-	fclose(input);
 	freeMain();
 	return exitCode;
 }

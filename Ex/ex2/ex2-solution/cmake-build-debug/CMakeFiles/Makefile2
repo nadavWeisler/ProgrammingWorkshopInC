@@ -35,19 +35,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /cygdrive/c/Users/Weisl/AppData/Local/JetBrains/CLion2020.1/cygwin_cmake/bin/cmake.exe
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /cygdrive/c/Users/Weisl/AppData/Local/JetBrains/CLion2020.1/cygwin_cmake/bin/cmake.exe -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution
+CMAKE_SOURCE_DIR = /mnt/c/Weisler/Study/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug
+CMAKE_BINARY_DIR = /mnt/c/Weisler/Study/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -74,14 +74,14 @@ clean: CMakeFiles/ex2_solution.dir/clean
 CMakeFiles/ex2_solution.dir/all:
 	$(MAKE) -f CMakeFiles/ex2_solution.dir/build.make CMakeFiles/ex2_solution.dir/depend
 	$(MAKE) -f CMakeFiles/ex2_solution.dir/build.make CMakeFiles/ex2_solution.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target ex2_solution"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/c/Weisler/Study/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target ex2_solution"
 .PHONY : CMakeFiles/ex2_solution.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ex2_solution.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Weisler/Study/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/ex2_solution.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /cygdrive/c/Users/Weisl/Desktop/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Weisler/Study/StudySemesterB/C_CPP/ProgrammingWorkshopInC_CPP/Ex/ex2/ex2-solution/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/ex2_solution.dir/rule
 
 # Convenience name for target.
