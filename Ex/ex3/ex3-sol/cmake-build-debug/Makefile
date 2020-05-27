@@ -123,32 +123,59 @@ ex3_sol/fast:
 	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/build
 .PHONY : ex3_sol/fast
 
-main.o: main.c.o
+RBTree.o: RBTree.c.o
 
-.PHONY : main.o
+.PHONY : RBTree.o
 
 # target to build an object file
-main.c.o:
-	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/main.c.o
-.PHONY : main.c.o
+RBTree.c.o:
+	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/RBTree.c.o
+.PHONY : RBTree.c.o
 
-main.i: main.c.i
+RBTree.i: RBTree.c.i
 
-.PHONY : main.i
+.PHONY : RBTree.i
 
 # target to preprocess a source file
-main.c.i:
-	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/main.c.i
-.PHONY : main.c.i
+RBTree.c.i:
+	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/RBTree.c.i
+.PHONY : RBTree.c.i
 
-main.s: main.c.s
+RBTree.s: RBTree.c.s
 
-.PHONY : main.s
+.PHONY : RBTree.s
 
 # target to generate assembly for a file
-main.c.s:
-	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/main.c.s
-.PHONY : main.c.s
+RBTree.c.s:
+	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/RBTree.c.s
+.PHONY : RBTree.c.s
+
+utilities/RBUtilities.o: utilities/RBUtilities.c.o
+
+.PHONY : utilities/RBUtilities.o
+
+# target to build an object file
+utilities/RBUtilities.c.o:
+	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/utilities/RBUtilities.c.o
+.PHONY : utilities/RBUtilities.c.o
+
+utilities/RBUtilities.i: utilities/RBUtilities.c.i
+
+.PHONY : utilities/RBUtilities.i
+
+# target to preprocess a source file
+utilities/RBUtilities.c.i:
+	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/utilities/RBUtilities.c.i
+.PHONY : utilities/RBUtilities.c.i
+
+utilities/RBUtilities.s: utilities/RBUtilities.c.s
+
+.PHONY : utilities/RBUtilities.s
+
+# target to generate assembly for a file
+utilities/RBUtilities.c.s:
+	$(MAKE) -f CMakeFiles/ex3_sol.dir/build.make CMakeFiles/ex3_sol.dir/utilities/RBUtilities.c.s
+.PHONY : utilities/RBUtilities.c.s
 
 # Help Target
 help:
@@ -159,9 +186,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... ex3_sol"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... RBTree.o"
+	@echo "... RBTree.i"
+	@echo "... RBTree.s"
+	@echo "... utilities/RBUtilities.o"
+	@echo "... utilities/RBUtilities.i"
+	@echo "... utilities/RBUtilities.s"
 .PHONY : help
 
 

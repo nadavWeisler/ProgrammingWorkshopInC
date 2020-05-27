@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/ex3_sol.dir/main.c.o"
+  "CMakeFiles/ex3_sol.dir/RBTree.c.o"
+  "CMakeFiles/ex3_sol.dir/utilities/RBUtilities.c.o"
   "ex3_sol"
   "ex3_sol.pdb"
 )

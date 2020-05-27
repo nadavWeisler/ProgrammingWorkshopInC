@@ -76,7 +76,16 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3-sol/main.c">
+		<Unit filename="/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3-sol/RBTree.c">
+			<Option target="ex3_sol"/>
+		</Unit>
+		<Unit filename="/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3-sol/RBTree.h">
+			<Option target="ex3_sol"/>
+		</Unit>
+		<Unit filename="/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3-sol/utilities/RBUtilities.c">
+			<Option target="ex3_sol"/>
+		</Unit>
+		<Unit filename="/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3-sol/utilities/RBUtilities.h">
 			<Option target="ex3_sol"/>
 		</Unit>
 		<Unit filename="/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3-sol/CMakeLists.txt">
