@@ -34,9 +34,9 @@ int getSide(CompareFunc compFunc, Node* root, void* data)
 	}
 }
 
-Node* getUncle(Node* root, void* data, CompareFunc compareFunc)
+Node* getUncle(Node* root, CompareFunc compareFunc)
 {
-	int parentSide = getSide(compareFunc, root->parent, data);
+	int parentSide = getSide(compareFunc, root->parent, root->data);
 	switch (parentSide)
 	{
 		case RIGHT:
@@ -49,12 +49,138 @@ Node* getUncle(Node* root, void* data, CompareFunc compareFunc)
 }
 
 /**
+ *
+ * @param root
+ * @param newNode
+ */
+void leftRotation(Node** root, Node* newNode)
+{
+	Node* rightNode = newNode->right;
+	newNode->right = rightNode->left;
+	if (newNode->right != NULL)
+	{
+		newNode->right->parent = newNode;
+	}
+	rightNode->parent = newNode->parent;
+	if (newNode->parent == NULL)
+	{
+		*root = rightNode;
+	}
+	else if (newNode == newNode->parent->left)
+	{
+		newNode->parent->left = rightNode;
+	}
+	else
+	{
+		newNode->parent->right = rightNode;
+	}
+	rightNode->left = newNode;
+	newNode->parent = rightNode;
+}
+
+/**
+ *
+ * @param root
+ * @param newNode
+ */
+void rightRotation(Node** root, Node* newNode)
+{
+	Node* leftNode = newNode->left;
+	newNode->left = leftNode->right;
+	if (leftNode->right != NULL)
+	{
+		leftNode->right->parent = newNode;
+	}
+	leftNode->parent = newNode->parent;
+	if (leftNode->parent == NULL)
+	{
+		*root = leftNode;
+	}
+	else if (newNode == newNode->parent->left)
+	{
+		newNode->parent->left = leftNode;
+	}
+	else
+	{
+		newNode->parent->right = leftNode;
+	}
+	leftNode->right = newNode;
+	newNode->parent = leftNode;
+}
+
+/**
  * To DO
  * @param tree
  * @return
  */
-int fixColor(RBTree* tree)
+int paintTree(RBTree* tree, Node* newNode)
 {
+	while (newNode->parent->color != RED && newNode != tree->root)
+	{
+		Node* uncle = getUncle(tree->root, newNode->data);
+		if (uncle->color == RED)
+		{
+			uncle->color = BLACK;
+			newNode->parent->color = BLACK;
+			newNode->parent->parent->color = RED;
+			newNode = newNode->parent->parent;
+		}
+		else
+		{
+			// Left-Left (LL) case, do following
+			// (i)  Swap color of parent and grandparent
+			// (ii) Right Rotate Grandparent
+			if (newNode->parent == newNode->parent->parent->left &&
+				newNode == newNode->parent->left)
+			{
+				Color parentColor = newNode->parent->color;
+				newNode->parent->color = newNode->parent->parent->color;
+				newNode->parent->parent->color = parentColor;
+				rightRotation(&(tree->root), newNode->parent->parent);
+			}
+
+			// Left-Right (LR) case, do following
+			// (i)  Swap color of current node  and grandparent
+			// (ii) Left Rotate Parent
+			// (iii) Right Rotate Grand Parent
+			if (newNode->parent == newNode->parent->parent->left &&
+				newNode == newNode->parent->right)
+			{
+				Color newNodeColor = newNode->color;
+				newNode->color = newNode->parent->parent->color;
+				newNode->parent->parent->color = newNodeColor;
+				leftRotation(&(tree->root), newNode->parent);
+				rightRotation(&(tree->root), newNode->parent->parent);
+			}
+
+			// Right-Right (RR) case, do following
+			// (i)  Swap color of parent and grandparent
+			// (ii) Left Rotate Grandparent
+			if (newNode->parent == newNode->parent->parent->right &&
+				newNode == newNode->parent->right)
+			{
+				Color parentColor = newNode->parent->color;
+				newNode->parent->color = newNode->parent->parent->color;
+				newNode->parent->parent->color = parentColor;
+				leftRotation(&(tree->root), newNode->parent->parent);
+			}
+
+			// Right-Left (RL) case, do following
+			// (i)  Swap color of current node  and grandparent
+			// (ii) Right Rotate Parent
+			// (iii) Left Rotate Grand Parent
+			if (newNode->parent == newNode->parent->parent->right &&
+				newNode == newNode->parent->left)
+			{
+				char currentColor = newNode->color;
+				newNode->color = newNode->parent->parent->color;
+				newNode->parent->parent->color = currentColor;
+				rightRotation(&(tree->root), newNode->parent);
+				leftRotation(&(tree->root), newNode->parent->parent);
+			}
+		}
+	}
+	tree->root->color = BLACK;
 	return TRUE;
 }
 
@@ -72,6 +198,27 @@ RBTree* newRBTree(CompareFunc compFunc, FreeFunc freeFunc)
 }
 
 /**
+ *
+ * @param tree
+ * @param data
+ * @return
+ */
+Node* getParentOfData(RBTree* tree, void* data)
+{
+	Node* root = tree->root;
+	Node* returnValue = NULL;
+	while (root != NULL)
+	{
+		returnValue = root;
+		if (data < root->data)
+			root = root->left;
+		else
+			root = root->right;
+	}
+	return returnValue;
+}
+
+/**
  * add an item to the tree
  * @param tree: the tree to add an item to.
  * @param data: item to add to the tree.
@@ -80,29 +227,36 @@ RBTree* newRBTree(CompareFunc compFunc, FreeFunc freeFunc)
 int insertToRBTree(RBTree* tree, void* data)
 {
 	int returnVal = TRUE;
-	Node* newNode = (Node*)malloc(sizeof(Node*));
+	Node* newNode = (Node*)malloc(sizeof(Node));
 	newNode->data = data;
-	newNode->color = RED;
+	newNode->left = NULL;
+	newNode->right = NULL;
+	newNode->parent = NULL;
 	if (tree->root == NULL)
 	{
 		newNode->color = BLACK;
 		tree->root = newNode;
 	}
-	else if (tree->root->color == BLACK)
+	else
 	{
-		int side = getSide(tree->compFunc, tree->root, data);
-		switch (side)
+		newNode->color = RED;
+		Node* newNodeParent = getParentOfData(tree, data);
+		newNode->parent = newNodeParent;
+		switch (getSide(tree->compFunc, newNodeParent, data))
 		{
-			case (LEFT):
-				tree->root->left = newNode;
+			case LEFT:
+				newNodeParent->left = newNode;
 				break;
-			case (RIGHT):
-				tree->root->right = newNode;
+			case RIGHT:
+				newNodeParent->right = newNode;
 				break;
 			default:
 				returnVal = FALSE;
+				break;
 		}
+		paintTree(tree, newNode);
 	}
+
 	return returnVal;
 }
 
@@ -154,6 +308,26 @@ int RBTreeContains(const RBTree* tree, const void* data)
 }
 
 /**
+ *
+ * @param node
+ * @param func
+ * @param args
+ */
+void forEachNode(const Node* node, forEachFunc func, void* args)
+{
+	if (node == NULL)
+	{
+		return;
+	}
+	else
+	{
+		forEachNode(node->left, func, args);
+		forEachNode(node->right, func, args);
+		func(node, args);
+	}
+}
+
+/**
  * Activate a function on each item of the tree. the order is an ascending order. if one of the activations of the
  * function returns 0, the process stops.
  * @param tree: the tree with all the items.
@@ -163,7 +337,26 @@ int RBTreeContains(const RBTree* tree, const void* data)
  */
 int forEachRBTree(const RBTree* tree, forEachFunc func, void* args)
 {
+	forEachNode(tree->root, func, args);
 	return TRUE;
+}
+
+/**
+ *
+ * @param root
+ */
+void freeNode(Node* root)
+{
+	if (root == NULL)
+	{
+		return;
+	}
+	else
+	{
+		freeNode(root->right);
+		freeNode(root->left);
+		free(root);
+	}
 }
 
 /**
@@ -172,7 +365,15 @@ int forEachRBTree(const RBTree* tree, forEachFunc func, void* args)
  */
 void freeRBTree(RBTree** tree)
 {
-
+	if (tree == NULL)
+	{
+		return;
+	}
+	else
+	{
+		freeNode((*tree)->root);
+		free(tree);
+	}
 }
 
 /**
@@ -195,6 +396,7 @@ int main()
 	int a = 2;
 	insertToRBTree(tree, &a);
 	printRBTree(tree->root);
+	freeRBTree(&tree);
 	return 0;
 }
 
