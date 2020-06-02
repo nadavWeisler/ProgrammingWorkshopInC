@@ -9,6 +9,24 @@
 #define RIGHT 1
 #define LEFT -1
 #define ME 0
+#define NONE -2
+
+/**
+ *
+ * @param tree
+ * @param data
+ * @param N
+ */
+void InsertNodeToTree(RBTree* tree, const void* data, Node* N);
+
+/**
+ *
+ * @param tree
+ * @param C
+ * @param P
+ * @param S
+ */
+void DbCase(RBTree* tree, Node* C, Node* P, Node* S);
 
 /**
  *
@@ -17,9 +35,13 @@
  * @param data
  * @return
  */
-int getSide(CompareFunc compFunc, Node* root, void* data)
+int getSide(Node* node, const void* data, CompareFunc compFunc)
 {
-	int val = compFunc(data, root->data);
+	if (node == NULL)
+	{
+		return NONE;
+	}
+	int val = compFunc(data, node->data);
 	if (val > BALANCE_POINT)
 	{
 		return RIGHT;
@@ -34,15 +56,22 @@ int getSide(CompareFunc compFunc, Node* root, void* data)
 	}
 }
 
-Node* getUncle(Node* root, CompareFunc compareFunc)
+/**
+ *
+ * @param node
+ * @param compareFunc
+ * @return
+ */
+Node* getSister(Node* node, CompareFunc compareFunc)
 {
-	int parentSide = getSide(compareFunc, root->parent, root->data);
-	switch (parentSide)
+	Node* P = node->parent;
+	int nodeSide = getSide(P, node->data, compareFunc);
+	switch (nodeSide)
 	{
-		case RIGHT:
-			return root->parent->parent->left;
 		case LEFT:
-			return root->parent->parent->right;
+			return P->right;
+		case RIGHT:
+			return P->left;
 		default:
 			return NULL;
 	}
@@ -50,62 +79,80 @@ Node* getUncle(Node* root, CompareFunc compareFunc)
 
 /**
  *
- * @param root
- * @param newNode
+ * @param tree
+ * @param node
  */
-void leftRotation(Node** root, Node* newNode)
+void leftRotation(RBTree* tree, Node* node)
 {
-	Node* rightNode = newNode->right;
-	newNode->right = rightNode->left;
-	if (newNode->right != NULL)
+	Node* rNode = node->right;
+	node->right = rNode->left;
+
+	if (node->right != NULL)
 	{
-		newNode->right->parent = newNode;
+		node->right->parent = node;
 	}
-	rightNode->parent = newNode->parent;
-	if (newNode->parent == NULL)
+
+	rNode->parent = node->parent;
+
+	if (node->parent == NULL)
 	{
-		*root = rightNode;
+		tree->root = rNode;
 	}
-	else if (newNode == newNode->parent->left)
+	else if (node == node->parent->left)
 	{
-		newNode->parent->left = rightNode;
+		node->parent->left = rNode;
 	}
 	else
 	{
-		newNode->parent->right = rightNode;
+		node->parent->right = rNode;
 	}
-	rightNode->left = newNode;
-	newNode->parent = rightNode;
+
+	rNode->left = node;
+	node->parent = rNode;
 }
 
 /**
  *
- * @param root
- * @param newNode
+ * @param tree
+ * @param node
  */
-void rightRotation(Node** root, Node* newNode)
+void rightRotation(RBTree* tree, Node* node)
 {
-	Node* leftNode = newNode->left;
-	newNode->left = leftNode->right;
-	if (leftNode->right != NULL)
+	Node* lNode = node->left;
+	node->left = lNode->right;
+
+	if (node->left != NULL)
 	{
-		leftNode->right->parent = newNode;
+		node->left->parent = node;
 	}
-	leftNode->parent = newNode->parent;
-	if (leftNode->parent == NULL)
+
+	lNode->parent = node->parent;
+
+	if (node->parent == NULL)
 	{
-		*root = leftNode;
+		tree->root = lNode;
 	}
-	else if (newNode == newNode->parent->left)
+	else if (node == node->parent->left)
 	{
-		newNode->parent->left = leftNode;
+		node->parent->left = lNode;
 	}
 	else
 	{
-		newNode->parent->right = leftNode;
+		node->parent->right = lNode;
 	}
-	leftNode->right = newNode;
-	newNode->parent = leftNode;
+
+	lNode->right = node;
+	node->parent = lNode;
+}
+
+/**
+ *
+ * @param node
+ * @return
+ */
+int isBlack(Node* node)
+{
+	return node == NULL || node->color == BLACK;
 }
 
 /**
@@ -113,88 +160,49 @@ void rightRotation(Node** root, Node* newNode)
  * @param tree
  * @return
  */
-int paintTree(RBTree* tree, Node* newNode)
+void paintTreeAfterInsert(RBTree* tree, Node* N)
 {
-	while (newNode->parent->color != RED && newNode != tree->root)
+	Node* P = N->parent;
+	if (isBlack(P) == TRUE)
 	{
-		Node* uncle = getUncle(tree->root, newNode->data);
-		if (uncle->color == RED)
+		N->color = RED;
+	}
+	else
+	{
+		Node* U = getSister(P, tree->compFunc);
+		Node* G = P->parent;
+		if (isBlack(U) == FALSE)
 		{
-			uncle->color = BLACK;
-			newNode->parent->color = BLACK;
-			newNode->parent->parent->color = RED;
-			newNode = newNode->parent->parent;
+			P->color = BLACK;
+			U->color = BLACK;
+			G->color = RED;
+			paintTreeAfterInsert(tree, P->parent);
 		}
 		else
 		{
-			// Left-Left (LL) case, do following
-			// (i)  Swap color of parent and grandparent
-			// (ii) Right Rotate Grandparent
-			if (newNode->parent == newNode->parent->parent->left &&
-				newNode == newNode->parent->left)
+			if (P == G->left && N == P->right)
 			{
-				Color parentColor = newNode->parent->color;
-				newNode->parent->color = newNode->parent->parent->color;
-				newNode->parent->parent->color = parentColor;
-				rightRotation(&(tree->root), newNode->parent->parent);
+				leftRotation(tree, P);
+			}
+			else if (P == G->right && N == P->left)
+			{
+				rightRotation(tree, P);
 			}
 
-			// Left-Right (LR) case, do following
-			// (i)  Swap color of current node  and grandparent
-			// (ii) Left Rotate Parent
-			// (iii) Right Rotate Grand Parent
-			if (newNode->parent == newNode->parent->parent->left &&
-				newNode == newNode->parent->right)
+			if (P == G->right && N == P->right)
 			{
-				Color newNodeColor = newNode->color;
-				newNode->color = newNode->parent->parent->color;
-				newNode->parent->parent->color = newNodeColor;
-				leftRotation(&(tree->root), newNode->parent);
-				rightRotation(&(tree->root), newNode->parent->parent);
+				leftRotation(tree, G);
+			}
+			else if (P == G->left && N == P->left)
+			{
+				rightRotation(tree, G);
 			}
 
-			// Right-Right (RR) case, do following
-			// (i)  Swap color of parent and grandparent
-			// (ii) Left Rotate Grandparent
-			if (newNode->parent == newNode->parent->parent->right &&
-				newNode == newNode->parent->right)
-			{
-				Color parentColor = newNode->parent->color;
-				newNode->parent->color = newNode->parent->parent->color;
-				newNode->parent->parent->color = parentColor;
-				leftRotation(&(tree->root), newNode->parent->parent);
-			}
-
-			// Right-Left (RL) case, do following
-			// (i)  Swap color of current node  and grandparent
-			// (ii) Right Rotate Parent
-			// (iii) Left Rotate Grand Parent
-			if (newNode->parent == newNode->parent->parent->right &&
-				newNode == newNode->parent->left)
-			{
-				char currentColor = newNode->color;
-				newNode->color = newNode->parent->parent->color;
-				newNode->parent->parent->color = currentColor;
-				rightRotation(&(tree->root), newNode->parent);
-				leftRotation(&(tree->root), newNode->parent->parent);
-			}
+			G->color = RED;
+			P->color = BLACK;
 		}
 	}
 	tree->root->color = BLACK;
-	return TRUE;
-}
-
-/**
- * constructs a new RBTree with the given CompareFunc.
- * comp: a function two compare two variables.
- */
-RBTree* newRBTree(CompareFunc compFunc, FreeFunc freeFunc)
-{
-	RBTree* new_tree = (RBTree*)malloc(sizeof(RBTree*));
-	new_tree->root = NULL;
-	new_tree->freeFunc = freeFunc;
-	new_tree->compFunc = compFunc;
-	return new_tree;
 }
 
 /**
@@ -203,19 +211,40 @@ RBTree* newRBTree(CompareFunc compFunc, FreeFunc freeFunc)
  * @param data
  * @return
  */
-Node* getParentOfData(RBTree* tree, void* data)
+Node* getNodeByData(RBTree* tree, void* data)
 {
-	Node* root = tree->root;
-	Node* returnValue = NULL;
-	while (root != NULL)
+	Node* currentNode = tree->root;
+	while (currentNode != NULL)
 	{
-		returnValue = root;
-		if (data < root->data)
-			root = root->left;
+		int side = getSide(currentNode, data, tree->compFunc);
+		if (side == LEFT)
+		{
+			currentNode = currentNode->left;
+		}
+		else if (side == RIGHT)
+		{
+			currentNode = currentNode->right;
+		}
 		else
-			root = root->right;
+		{
+			break;
+		}
 	}
-	return returnValue;
+	return currentNode;
+}
+
+/**
+ * constructs a new RBTree with the given CompareFunc.
+ * comp: a function two compare two variables.
+ */
+RBTree* newRBTree(CompareFunc compFunc, FreeFunc freeFunc)
+{
+	RBTree* newTree = (RBTree*)malloc(sizeof(RBTree));
+	newTree->root = NULL;
+	newTree->size = 0;
+	newTree->compFunc = compFunc;
+	newTree->freeFunc = freeFunc;
+	return newTree;
 }
 
 /**
@@ -226,38 +255,79 @@ Node* getParentOfData(RBTree* tree, void* data)
  */
 int insertToRBTree(RBTree* tree, void* data)
 {
-	int returnVal = TRUE;
-	Node* newNode = (Node*)malloc(sizeof(Node));
-	newNode->data = data;
-	newNode->left = NULL;
-	newNode->right = NULL;
-	newNode->parent = NULL;
-	if (tree->root == NULL)
+	if (RBTreeContains(tree, data))
 	{
-		newNode->color = BLACK;
-		tree->root = newNode;
+		return FALSE;
+	}
+	Node* N = (Node*)malloc(sizeof(Node));
+	N->data = data;
+	N->left = NULL;
+	N->right = NULL;
+	N->parent = NULL;
+
+	InsertNodeToTree(tree, data, N);
+
+	if (tree->root == N)
+	{
+		N->color = BLACK;
 	}
 	else
 	{
-		newNode->color = RED;
-		Node* newNodeParent = getParentOfData(tree, data);
-		newNode->parent = newNodeParent;
-		switch (getSide(tree->compFunc, newNodeParent, data))
-		{
-			case LEFT:
-				newNodeParent->left = newNode;
-				break;
-			case RIGHT:
-				newNodeParent->right = newNode;
-				break;
-			default:
-				returnVal = FALSE;
-				break;
-		}
-		paintTree(tree, newNode);
+		paintTreeAfterInsert(tree, N);
 	}
 
-	return returnVal;
+	tree->size += 1;
+
+	return TRUE;
+}
+
+/**
+ *
+ * @param tree
+ * @param data
+ * @param N
+ */
+void InsertNodeToTree(RBTree* tree, const void* data, Node* N)
+{
+	if (tree->root == NULL)
+	{
+		tree->root = N;
+	}
+	else
+	{
+		Node* currentNode = tree->root;
+		int side;
+		while (N->parent == NULL)
+		{
+			side = getSide(currentNode, data, tree->compFunc);
+			if (side == LEFT)
+			{
+				if (currentNode->left == NULL)
+				{
+					currentNode->left = N;
+					N->parent = currentNode;
+					break;
+				}
+				else
+				{
+					currentNode = currentNode->left;
+				}
+			}
+			else
+			{
+				if (currentNode->right == NULL)
+				{
+					currentNode->right = N;
+					N->parent = currentNode;
+					break;
+				}
+				else
+				{
+					currentNode = currentNode->right;
+				}
+			}
+		}
+	}
 }
 
 /**
@@ -268,7 +338,155 @@ int insertToRBTree(RBTree* tree, void* data)
  */
 int deleteFromRBTree(RBTree* tree, void* data)
 {
+	if (tree == NULL || RBTreeContains(tree, data) == FALSE || tree->root == NULL)
+	{
+		return FALSE;
+	}
+
+	Node* M = getNodeByData(tree, data);
+	Node* C = NULL;
+	if (M->left != NULL)
+	{
+		C = M->left;
+	}
+	else if (M->right != NULL)
+	{
+		C = M->right;
+	}
+	Node* P = M->parent;
+	Node* S = getSister(M, tree->compFunc);
+
+	if (M->color == RED)
+	{
+		if (P->right == M)
+		{
+			P->right = NULL;
+		}
+		else
+		{
+			P->left = NULL;
+		}
+		free(M);
+		M = NULL;
+	}
+	else
+	{
+
+		void* cData = C->data;
+		C->data = M->data;
+		M->data = cData;
+		if (C->parent->left == C)
+		{
+			C->parent->left = NULL;
+		}
+		else
+		{
+			C->parent->right = NULL;
+		}
+		Node* tmpNode = C;
+		free(tmpNode);
+		C = M;
+		if (isBlack(C) == FALSE)
+		{
+			C->color = BLACK;
+		}
+		else
+		{
+			DbCase(tree, C, P, S);
+		}
+	}
+
+	tree->size -= 1;
+
 	return TRUE;
+}
+
+/**
+ *
+ * @param tree
+ * @param C
+ * @param P
+ * @param S
+ */
+void DbCase(RBTree* tree, Node* C, Node* P, Node* S)
+{
+	if (tree->root == C)
+	{
+		return;
+	}
+	else if (isBlack(S) == TRUE && isBlack(S->left) == TRUE &&
+		isBlack(S->right) == TRUE)
+	{
+		if (isBlack(P) == FALSE)
+		{
+			P->color = BLACK;
+			S->color = RED;
+		}
+		else
+		{
+			S->color = RED;
+			DbCase(tree, P, P->parent, getSister(P->parent, tree->compFunc));
+		}
+	}
+	else if (isBlack(S) == FALSE)
+	{
+		S->color = BLACK;
+		P->color = RED;
+		if (C == P->left)
+		{
+			leftRotation(tree, P);
+		}
+		else
+		{
+			rightRotation(tree, P);
+		}
+		DbCase(tree, C, P, S);
+	}
+	else
+	{
+		Node* Sc;
+		Node* Sf;
+		if (P->parent->left == P)
+		{
+			Sc = S->right;
+			Sf = S->left;
+		}
+		else
+		{
+			Sc = S->left;
+			Sf = S->right;
+		}
+		if (isBlack(Sf) == TRUE && isBlack(Sc) == FALSE)
+		{
+			Sc->color = BLACK;
+			S->color = RED;
+
+			if (P->parent->left == P)
+			{
+				rightRotation(tree, S);
+			}
+			else
+			{
+				leftRotation(tree, S);
+			}
+		}
+
+		if (isBlack(S) == TRUE && isBlack(Sc) == FALSE)
+		{
+			S->color = RED;
+			P->color = BLACK;
+
+			if (P->left == C)
+			{
+				leftRotation(tree, P);
+			}
+			else
+			{
+				rightRotation(tree, P);
+			}
+			Sc->color = BLACK;
+		}
+	}
 }
 
 /**
@@ -284,7 +502,7 @@ int containsNode(Node* node, const void* data, CompareFunc compareFunc)
 	{
 		return FALSE;
 	}
-	int side = getSide(compareFunc, node, &data);
+	int side = getSide(node, data, compareFunc);
 	switch (side)
 	{
 		case RIGHT:
@@ -345,17 +563,17 @@ int forEachRBTree(const RBTree* tree, forEachFunc func, void* args)
  *
  * @param root
  */
-void freeNode(Node* root)
+void freeNode(Node* node)
 {
-	if (root == NULL)
+	if (node == NULL)
 	{
 		return;
 	}
 	else
 	{
-		freeNode(root->right);
-		freeNode(root->left);
-		free(root);
+		freeNode(node->right);
+		freeNode(node->left);
+		free(node);
 	}
 }
 
@@ -392,11 +610,74 @@ int intComp(const void* a, const void* b)
 int main()
 {
 	RBTree* tree = newRBTree(&intComp, NULL);
-	printf("Hello, World!\n");
-	int a = 2;
-	insertToRBTree(tree, &a);
+
+	int data_7 = 7;
+	printf("Data: %d\n", data_7);
+	insertToRBTree(tree, &data_7);
+	printf("Valid: %d\n", isValidRBTree(tree));
 	printRBTree(tree->root);
+
+	int data_8 = 8;
+	printf("Data: %d\n", data_8);
+	insertToRBTree(tree, &data_8);
+	printf("Valid: %d\n", isValidRBTree(tree));
+	printRBTree(tree->root);
+
+	deleteFromRBTree(tree, &data_7);
+	printf("Valid: %d\n", isValidRBTree(tree));
+	printRBTree(tree->root);
+
+	int data_6 = 6;
+	printf("Data: %d\n", data_6);
+	insertToRBTree(tree, &data_6);
+	printf("Valid: %d\n", isValidRBTree(tree));
+	printRBTree(tree->root);
+
+	printf("Data: %d\n", data_6);
+	insertToRBTree(tree, &data_6);
+	printf("Valid: %d\n", isValidRBTree(tree));
+	printRBTree(tree->root);
+
+	deleteFromRBTree(tree, &data_7);
+	printf("Valid: %d\n", isValidRBTree(tree));
+	printRBTree(tree->root);
+
+	deleteFromRBTree(tree, &data_6);
+	printf("Valid: %d\n", isValidRBTree(tree));
+	printRBTree(tree->root);
+
+
+//	int data_9 = 9;
+//	printf("Data: %d\n", data_9);
+//	insertToRBTree(tree, &data_9);
+//	printf("Valid: %d\n", isValidRBTree(tree));
+//	printRBTree(tree->root);
+//
+//	int data_10 = 10;
+//	printf("Data: %d\n", data_10);
+//	insertToRBTree(tree, &data_10);
+//	printf("Valid: %d\n", isValidRBTree(tree));
+//	printRBTree(tree->root);
+//
+//	int data_12 = 12;
+//	printf("Data: %d\n", data_12);
+//	insertToRBTree(tree, &data_12);
+//	printf("Valid: %d\n", isValidRBTree(tree));
+//	printRBTree(tree->root);
+//
+//	int data_1 = 1;
+//	printf("Data: %d\n", data_1);
+//	insertToRBTree(tree, &data_1);
+//	printf("Valid: %d\n", isValidRBTree(tree));
+//	printRBTree(tree->root);
+//
+//	int data_11 = 11;
+//	printf("Data: %d\n", data_11);
+//	insertToRBTree(tree, &data_11);
+//	printf("Valid: %d\n", isValidRBTree(tree));
+//	printRBTree(tree->root);
+
 	freeRBTree(&tree);
-	return 0;
+	deleteFromRBTree(tree, (void*)&data_7);
 }
 
