@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "RBTree.h"
 #include "utilities/RBUtilities.h"
 #define TRUE 1
@@ -153,6 +154,24 @@ void rightRotation(RBTree* tree, Node* node)
 int isBlack(Node* node)
 {
 	return node == NULL || node->color == BLACK;
+}
+
+Node* getMinimum(Node* node)
+{
+	if (node->left != NULL)
+    {
+        return getMinimum(node->left);
+    }
+    return node;
+}
+
+Node* getSuccessor(Node* node)
+{
+    if (node->right == NULL)
+    {
+        return node->left;
+    }
+    return getMinimum(node->right);
 }
 
 /**
@@ -531,17 +550,12 @@ int RBTreeContains(const RBTree* tree, const void* data)
  * @param func
  * @param args
  */
-void forEachNode(const Node* node, forEachFunc func, void* args)
+void forEachNode(Node* node, forEachFunc func, void* args)
 {
-	if (node == NULL)
+	if (node != NULL)
 	{
-		return;
-	}
-	else
-	{
-		forEachNode(node->left, func, args);
-		forEachNode(node->right, func, args);
 		func(node, args);
+		forEachNode(getSuccessor(node), func, args);
 	}
 }
 
@@ -555,7 +569,7 @@ void forEachNode(const Node* node, forEachFunc func, void* args)
  */
 int forEachRBTree(const RBTree* tree, forEachFunc func, void* args)
 {
-	forEachNode(tree->root, func, args);
+	forEachNode(getMinimum(tree->root), func, args);
 	return TRUE;
 }
 
@@ -563,17 +577,14 @@ int forEachRBTree(const RBTree* tree, forEachFunc func, void* args)
  *
  * @param root
  */
-void freeNode(Node* node)
+void freeNode(Node* node, FreeFunc freeFunc)
 {
-	if (node == NULL)
+	if(node != NULL)
 	{
-		return;
-	}
-	else
-	{
-		freeNode(node->right);
-		freeNode(node->left);
+		freeNode(getSuccessor(node), freeFunc);
+		freeFunc(node->data);
 		free(node);
+		node = NULL;
 	}
 }
 
@@ -583,14 +594,10 @@ void freeNode(Node* node)
  */
 void freeRBTree(RBTree** tree)
 {
-	if (tree == NULL)
+	if (tree != NULL)
 	{
-		return;
-	}
-	else
-	{
-		freeNode((*tree)->root);
-		free(tree);
+		forEachRBTree(*tree, freeNode, NULL);
+		free(*tree);
 	}
 }
 
