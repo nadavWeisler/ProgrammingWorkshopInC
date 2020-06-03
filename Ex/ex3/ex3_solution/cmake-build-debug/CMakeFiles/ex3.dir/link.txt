@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/ex3.dir/Structs.c.o CMakeFiles/ex3.dir/RBTree.c.o CMakeFiles/ex3.dir/RButilities.c.o  -o ex3 

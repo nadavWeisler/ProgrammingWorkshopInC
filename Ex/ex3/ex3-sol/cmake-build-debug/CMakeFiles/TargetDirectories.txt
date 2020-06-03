@@ -1,3 +1,0 @@
-/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3-sol/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3-sol/cmake-build-debug/CMakeFiles/edit_cache.dir
-/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3-sol/cmake-build-debug/CMakeFiles/ex3_sol.dir

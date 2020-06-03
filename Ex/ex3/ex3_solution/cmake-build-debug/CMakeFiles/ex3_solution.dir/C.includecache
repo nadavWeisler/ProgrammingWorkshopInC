@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3_solution/RBTree.c
+stdio.h
+-
+stdlib.h
+-
+RBTree.h
+/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3_solution/RBTree.h
+
+/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3_solution/RBTree.h
+
+/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3_solution/Structs.c
+stdlib.h
+-
+RBTree.h
+/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3_solution/RBTree.h
+Structs.h
+/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3_solution/Structs.h
+string.h
+-
+
+/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3_solution/Structs.h
+RBTree.h
+/mnt/c/Weisler/Study/StudySemesterB/C/ProgrammingWorkshopInC/Ex/ex3/ex3_solution/RBTree.h
+
