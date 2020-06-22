@@ -1,3 +1,16 @@
+Ex/ex1/cmake-build-debug
+Ex/ex1/.idea
+Ex/ex1/CMakeLists.txt
+
+Ex/ex2/ex2-solution/cmake-build-debug
+Ex/ex2-solution/.idea
+Ex/ex2-solution/CMakeLists.txt
+
+Ex/ex3/ex3_solution/cmake-build-debug
+Ex/ex3/ex3_solution/.idea
+Ex/ex3/ex3_solution/CMakeLists.txt
+
+
 # Prerequisites
 *.d
 
