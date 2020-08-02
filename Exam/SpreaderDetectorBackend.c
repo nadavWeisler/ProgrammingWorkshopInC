@@ -13,12 +13,12 @@
 
 #include "SpreaderDetectorParams.h"
 
-struct infection
+typedef struct infection
 {
     float distance;
     float time;
     char *infectedId;
-};
+} Infection;
 
 typedef struct person
 {
@@ -26,44 +26,23 @@ typedef struct person
     char *id;
     float age;
     struct infection *infections;
-    int infectionCountForPerson;
+    int infectionCount;
+    float chance;
 } Person;
-
-typedef struct meeting
-{
-    char *infectorId;
-    char *infectedId;
-    float distance;
-    float time;
-} Meeting;
-
-typedef struct coronaTree
-{
-    Person *infector;
-    Person *infected;
-    float distance;
-    float time;
-} Infection;
 
 Person **peoples;
 int peopleCount;
-Meeting ***meeting;
-int *meetingCount;
-int meetingsGroupsCount;
-Infection **infections;
-int infectionsCount = 0;
+float *chanceMatrix;
 
 Person *getPersonFromId(const char *id);
 
 void RemoveNewLineChar(char *line);
 
-void RemoveBadChar(char *line);
+int getMatIndex(int i, int j, int n);
 
 void freePeoples();
 
-void freeMeetings();
-
-double crna(double distance, double time)
+float crna(float distance, float time)
 {
     return (time * MIN_DISTANCE) / (distance * MAX_TIME);
 }
@@ -75,102 +54,99 @@ void updatePersonFromLine(Person *person, char *line)
     char **literal = NULL;
     while (splitLine != NULL)
     {
-        switch (count)
+        if (count == 0)
         {
-            case 0:
-                person->name = strdup(splitLine);
-                break;
-            case 1:
-                person->id = strdup(splitLine);
-                break;
-            case 2:
-                person->age = strtof(splitLine, literal);
-                break;
+            person->name = strdup(splitLine);
+        }
+        else if (count == 1)
+        {
+            person->id = strdup(splitLine);
+        }
+        else if (count == 2)
+        {
+            person->age = strtof(splitLine, literal);
         }
         count++;
         splitLine = strtok(NULL, " ");
     }
+    person->infections = NULL;
+    person->infectionCount = 0;
+    person->chance = 0;
 }
 
-Meeting *getMeetingFromLine(char *line)
+void getInfectionFromLine(Person *currentPerson, char *line)
 {
-    Meeting *newMeeting = (Meeting *) malloc(sizeof(Meeting));
     char *splitLine = strtok(line, " ");
     int count = 0;
     char **literal = NULL;
+    Person *infector = currentPerson;
+    Person *infected;
+    Infection infection;
     while (splitLine != NULL)
     {
-        switch (count)
+        if (count == 0)
         {
-            case 0:
-                newMeeting->infectorId = strdup(splitLine);
-                break;
-            case 1:
-                newMeeting->infectedId = strdup(splitLine);
-                break;
-            case 2:
-                newMeeting->distance = strtof(splitLine, literal);
-                break;
-            case 3:
-                newMeeting->time = strtof(splitLine, literal);
-                break;
-            default:
-                return NULL;
+            if (splitLine != infector->id)
+            {
+                infector = getPersonFromId(splitLine);
+            }
+        }
+        else if (count == 1)
+        {
+            infected = getPersonFromId(splitLine);
+            infection.infectedId = infected->id;
+        }
+        else if (count == 2)
+        {
+            infection.distance = strtof(splitLine, literal);
+        }
+        else if (count == 3)
+        {
+            infection.time = strtof(splitLine, literal);
         }
         count++;
         splitLine = strtok(NULL, " ");
     }
-    return newMeeting;
+
+    infector->infectionCount++;
+    infector->infections = (Infection *) realloc(infector->infections,
+                                                 sizeof(Infection) *
+                                                 infector->infectionCount);
+    infector->infections[infector->infectionCount - 1] = infection;
 }
 
-Infection *getInfectionFromLine(Person *currentPerson, char *line)
+void updatePersonInfectedFromLine(char *line)
 {
-    Infection *newInfection = (Infection *) malloc(sizeof(Infection));
     char *splitLine = strtok(line, " ");
     int count = 0;
     char **literal = NULL;
-    Person *person = currentPerson;
-    struct infection infection;
+    Person *infector;
+    Person *infected;
+    float distance;
+    float time;
     while (splitLine != NULL)
     {
-        switch (count)
+        if (count == 0)
         {
-            case 0:
-                if (splitLine == person->id)
-                {
-                    newInfection->infector = currentPerson;
-                }
-                else
-                {
-                    newInfection->infector = getPersonFromId(splitLine);
-                }
-                break;
-            case 1:
-                newInfection->infected = getPersonFromId(splitLine);
-                infection.infectedId = newInfection->infected->id;
-                break;
-            case 2:
-                newInfection->distance = strtof(splitLine, literal);
-                infection.distance = strtof(splitLine, literal);
-                break;
-            case 3:
-                newInfection->time = strtof(splitLine, literal);
-                infection.time = strtof(splitLine, literal);
-                break;
-            default:
-                return NULL;
+            infector = getPersonFromId(splitLine);
+        }
+        else if (count == 1)
+        {
+            infected = getPersonFromId(splitLine);
+        }
+        else if (count == 2)
+        {
+            distance = strtof(splitLine, literal);
+        }
+        else if (count == 3)
+        {
+            time = strtof(splitLine, literal);
         }
         count++;
         splitLine = strtok(NULL, " ");
     }
-    newInfection->infector->infectionCountForPerson++;
-    newInfection->infector->infections = (struct infection *) realloc(
-            newInfection->infector->infections,
-            newInfection->infector->infectionCountForPerson *
-            sizeof(struct infection));
-    newInfection->infector->infections[newInfection->infector->infectionCountForPerson - 1] =
-            infection;
-    return newInfection;
+
+    infected->chance = infector->chance * crna(distance, time);
 }
 
 Person *getPersonFromId(const char *id)
@@ -187,21 +163,7 @@ Person *getPersonFromId(const char *id)
 
 void printPerson(Person *p)
 {
-    printf("%s %s %f %d\n", p->name, p->id, p->age, p->infectionCountForPerson);
-}
-
-void printMeeting(Meeting *m)
-{
-    printf("%s %s %f %f\n", m->infectorId, m->infectedId, m->distance, m->time);
-}
-
-void printInfection(Infection *i)
-{
-    printf("-------\n");
-    printPerson(i->infector);
-    printPerson(i->infected);
-    printf("%f %f\n", i->distance, i->time);
-    printf("-------\n");
+    printf("%s %s %f %d\n", p->name, p->id, p->age, p->infectionCount);
 }
 
 int readPeopleFile(FILE *file)
@@ -250,66 +212,37 @@ void RemoveBadChar(char *line)
     }
 }
 
-int readMeetingsFileOld(FILE *file)
+float getChance(Person *infector, Person *infected)
 {
-    char line[LINE_LENGTH];
-    meeting = (Meeting ***) malloc(0);
-    int firstLine = TRUE;
-    char *currentId;
-    while (fgets(line, LINE_LENGTH, file))
+    if (infector->id != infected->id)
     {
-        RemoveNewLineChar(line);
-        if (firstLine)
+        for (int i = 0; i < infector->infectionCount; i++)
         {
-            currentId = strdup(line);
-            meetingsGroupsCount = 1;
-            meetingCount = (int *) malloc(sizeof(int));
-            meeting[0] = (Meeting **) malloc(0);
-            meetingCount[0] = 0;
-            firstLine = FALSE;
-        }
-        else
-        {
-            if (line[0] == NEW_LINE_CHAR)
+            if (infector->infections[i].infectedId == infected->id)
             {
-                continue;
-            }
-            Meeting *newMeeting = getMeetingFromLine(line);
-            if (newMeeting != NULL)
-            {
-                if (newMeeting->infectorId == currentId)
-                {
-                    meetingCount[meetingsGroupsCount - 1]++;
-                    meeting[meetingsGroupsCount - 1] =
-                            (Meeting **) realloc(meeting[meetingsGroupsCount - 1],
-                                                 meetingCount[meetingsGroupsCount - 1] *
-                                                 sizeof(Meeting *));
-                }
-                else
-                {
-                    meetingsGroupsCount++;
-                    meetingCount = (int *) realloc(meetingCount,
-                                                   meetingsGroupsCount * sizeof(int));
-                    meetingCount[meetingsGroupsCount - 1] = 1;
-                    meeting[meetingsGroupsCount - 1] = (Meeting **) malloc(sizeof(Meeting *));
-
-                }
-                meeting[meetingsGroupsCount - 1][meetingCount[meetingsGroupsCount - 1]] =
-                        newMeeting;
-            }
-            else
-            {
-                return FALSE;
+                return crna(infector->infections[i].distance,
+                            infector->infections[i].time);
             }
         }
     }
-    return TRUE;
+    return 0;
+}
+
+void UpdateChanceMatrix()
+{
+    chanceMatrix = (float *) malloc(sizeof(float) * peopleCount * peopleCount);
+    for (int i = 0; i < peopleCount; i++)
+    {
+        for (int j = 0; j < peopleCount; j++)
+        {
+            chanceMatrix[getMatIndex(i,j, peopleCount)] = getChance(peoples[i], peoples[j]);
+        }
+    }
 }
 
 int readMeetingsFile(FILE *file)
 {
     char line[LINE_LENGTH];
-    infections = (Infection **) malloc(0);
     int firstLine = TRUE;
     char *currentId;
     Person *currentPerson;
@@ -329,19 +262,7 @@ int readMeetingsFile(FILE *file)
             {
                 continue;
             }
-            Infection *newInfection = getInfectionFromLine(currentPerson, line);
-
-            if (newInfection != NULL)
-            {
-                infectionsCount++;
-                infections = (Infection **) realloc(infections,
-                                                    sizeof(Infection *) * infectionsCount);
-                infections[infectionsCount - 1] = newInfection;
-            }
-            else
-            {
-                return FALSE;
-            }
+            getInfectionFromLine(currentPerson, line);
         }
     }
     return TRUE;
@@ -357,24 +278,6 @@ void freeMain()
 {
     printf("Free!\n");
     freePeoples();
-    freeMeetings();
-}
-
-void freeMeetings()
-{
-    if (meetingCount > 0)
-    {
-        for (int i = 0; i < meetingsGroupsCount; i++)
-        {
-            for (int j = 0; j < meetingCount[i]; j++)
-            {
-                free(meeting[i][j]);
-            }
-            free(meeting[i]);
-        }
-        free(meeting);
-    }
-    meeting = NULL;
 }
 
 void freePeoples()
@@ -400,11 +303,20 @@ void printAllPeople()
     }
 }
 
-void printAllInfections()
+int getMatIndex(int i, int j, int n)
 {
-    for (int i = 0; i < infectionsCount; i++)
+    return i * n + j;
+}
+
+void printMatrix()
+{
+    for (int i = 0; i < peopleCount; i++)
     {
-        printInfection(infections[i]);
+        for (int j = 0; j < peopleCount; j++)
+        {
+            printf(" %f ", chanceMatrix[getMatIndex(i,j, peopleCount)]);
+        }
+        printf("\n");
     }
 }
 
@@ -423,7 +335,8 @@ int main(int argc, char *argv[])
     if (readPeopleFile(peopleFile) && readMeetingsFile(meetingFile))
     {
         printAllPeople();
-        printAllInfections();
+        UpdateChanceMatrix();
+        printMatrix();
         freeMain();
         return EXIT_SUCCESS;
     }
