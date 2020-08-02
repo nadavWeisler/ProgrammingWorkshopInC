@@ -10,37 +10,48 @@
 #define LINE_LENGTH 1024
 #define TRUE 0==0
 #define FALSE 0==1
+#define CONVERSION_BASE 10
 
 #include "SpreaderDetectorParams.h"
-
-typedef struct infection
-{
-    float distance;
-    float time;
-    char *infectedId;
-} Infection;
 
 typedef struct person
 {
     char *name;
-    char *id;
+    long id;
     float age;
-    struct infection *infections;
-    int infectionCount;
     float chance;
 } Person;
 
 Person **peoples;
 int peopleCount;
-float *chanceMatrix;
 
-Person *getPersonFromId(const char *id);
+Person *getPersonFromId(long id);
 
 void RemoveNewLineChar(char *line);
 
-int getMatIndex(int i, int j, int n);
-
 void freePeoples();
+
+float crna(float distance, float time);
+
+void printPerson(Person *p);
+
+void updatePersonFromLine(Person *person, char *line);
+
+void updatePersonInfectedFromLine(char *line);
+
+int readPeopleFile(FILE *file);
+
+int readMeetingsFile(FILE *file);
+
+void freeMain();
+
+void printAllPeople();
+
+void merge(int startIndex, int middleIndex, int endIndex);
+
+void mergeSort(int startIndex, int endIndex);
+
+void writeOutputFile(char *outputFilePath);
 
 float crna(float distance, float time)
 {
@@ -60,7 +71,7 @@ void updatePersonFromLine(Person *person, char *line)
         }
         else if (count == 1)
         {
-            person->id = strdup(splitLine);
+            person->id = strtol(splitLine, literal, CONVERSION_BASE);
         }
         else if (count == 2)
         {
@@ -69,50 +80,7 @@ void updatePersonFromLine(Person *person, char *line)
         count++;
         splitLine = strtok(NULL, " ");
     }
-    person->infections = NULL;
-    person->infectionCount = 0;
     person->chance = 0;
-}
-
-void getInfectionFromLine(Person *currentPerson, char *line)
-{
-    char *splitLine = strtok(line, " ");
-    int count = 0;
-    char **literal = NULL;
-    Person *infector = currentPerson;
-    Person *infected;
-    Infection infection;
-    while (splitLine != NULL)
-    {
-        if (count == 0)
-        {
-            if (splitLine != infector->id)
-            {
-                infector = getPersonFromId(splitLine);
-            }
-        }
-        else if (count == 1)
-        {
-            infected = getPersonFromId(splitLine);
-            infection.infectedId = infected->id;
-        }
-        else if (count == 2)
-        {
-            infection.distance = strtof(splitLine, literal);
-        }
-        else if (count == 3)
-        {
-            infection.time = strtof(splitLine, literal);
-        }
-        count++;
-        splitLine = strtok(NULL, " ");
-    }
-
-    infector->infectionCount++;
-    infector->infections = (Infection *) realloc(infector->infections,
-                                                 sizeof(Infection) *
-                                                 infector->infectionCount);
-    infector->infections[infector->infectionCount - 1] = infection;
 }
 
 void updatePersonInfectedFromLine(char *line)
@@ -124,15 +92,18 @@ void updatePersonInfectedFromLine(char *line)
     Person *infected;
     float distance;
     float time;
+    long currentId;
     while (splitLine != NULL)
     {
         if (count == 0)
         {
-            infector = getPersonFromId(splitLine);
+            currentId = strtol(splitLine, literal, CONVERSION_BASE);
+            infector = getPersonFromId(currentId);
         }
         else if (count == 1)
         {
-            infected = getPersonFromId(splitLine);
+            currentId = strtol(splitLine, literal, CONVERSION_BASE);
+            infected = getPersonFromId(currentId);
         }
         else if (count == 2)
         {
@@ -146,14 +117,18 @@ void updatePersonInfectedFromLine(char *line)
         splitLine = strtok(NULL, " ");
     }
 
-    infected->chance = infector->chance * crna(distance, time);
+    infected->chance = crna(distance, time);
+    if (infector->chance != 0)
+    {
+        infected->chance *= infector->chance;
+    }
 }
 
-Person *getPersonFromId(const char *id)
+Person *getPersonFromId(long id)
 {
     for (int i = 0; i < peopleCount; i++)
     {
-        if (strcmp(peoples[i]->id, id) == 0)
+        if (peoples[i]->id == id)
         {
             return peoples[i];
         }
@@ -163,7 +138,7 @@ Person *getPersonFromId(const char *id)
 
 void printPerson(Person *p)
 {
-    printf("%s %s %f %d\n", p->name, p->id, p->age, p->infectionCount);
+    printf("%s %lu %f %f\n", p->name, p->id, p->age, p->chance);
 }
 
 int readPeopleFile(FILE *file)
@@ -203,57 +178,22 @@ void RemoveNewLineChar(char *line)
     }
 }
 
-void RemoveBadChar(char *line)
-{
-    unsigned long strLen = strlen(line);
-    if (line[strLen - 1] == BACKSLASH_R)
-    {
-        line[strLen - 1] = '\0';
-    }
-}
-
-float getChance(Person *infector, Person *infected)
-{
-    if (infector->id != infected->id)
-    {
-        for (int i = 0; i < infector->infectionCount; i++)
-        {
-            if (infector->infections[i].infectedId == infected->id)
-            {
-                return crna(infector->infections[i].distance,
-                            infector->infections[i].time);
-            }
-        }
-    }
-    return 0;
-}
-
-void UpdateChanceMatrix()
-{
-    chanceMatrix = (float *) malloc(sizeof(float) * peopleCount * peopleCount);
-    for (int i = 0; i < peopleCount; i++)
-    {
-        for (int j = 0; j < peopleCount; j++)
-        {
-            chanceMatrix[getMatIndex(i,j, peopleCount)] = getChance(peoples[i], peoples[j]);
-        }
-    }
-}
-
 int readMeetingsFile(FILE *file)
 {
     char line[LINE_LENGTH];
     int firstLine = TRUE;
-    char *currentId;
+    long currentId;
     Person *currentPerson;
+    char **literal = NULL;
+
     while (fgets(line, LINE_LENGTH, file))
     {
         RemoveNewLineChar(line);
         if (firstLine)
         {
-            currentId = strdup(line);
-            RemoveNewLineChar(currentId);
+            currentId = strtol(line, literal, CONVERSION_BASE);
             currentPerson = getPersonFromId(currentId);
+            currentPerson->chance = 1;
             firstLine = FALSE;
         }
         else
@@ -262,7 +202,7 @@ int readMeetingsFile(FILE *file)
             {
                 continue;
             }
-            getInfectionFromLine(currentPerson, line);
+            updatePersonInfectedFromLine(line);
         }
     }
     return TRUE;
@@ -271,6 +211,25 @@ int readMeetingsFile(FILE *file)
 void writeOutputFile(char *outputFilePath)
 {
     FILE *outputFile = fopen(outputFilePath, WRITE_FILE_PERMISSION);
+    Person *currentPerson;
+    char *currentMsg;
+    for (int i = 0; i < peopleCount; i++)
+    {
+        currentPerson = peoples[i];
+        if (currentPerson->chance >= MEDICAL_SUPERVISION_THRESHOLD)
+        {
+            currentMsg = MEDICAL_SUPERVISION_THRESHOLD_MSG;
+        }
+        else if (currentPerson->chance >= REGULAR_QUARANTINE_THRESHOLD)
+        {
+            currentMsg = REGULAR_QUARANTINE_MSG;
+        }
+        else
+        {
+            currentMsg = CLEAN_MSG;
+        }
+        fprintf(outputFile, currentMsg, currentPerson->name, currentPerson->id);
+    }
     fclose(outputFile);
 }
 
@@ -303,21 +262,38 @@ void printAllPeople()
     }
 }
 
-int getMatIndex(int i, int j, int n)
+int partition(int low, int high)
 {
-    return i * n + j;
+    Person* pivot = peoples[high];
+    int wall = low;
+    for (int i = low; i < high; i++)
+    {
+        if (peoples[i]->chance > pivot->chance)
+        {
+            Person* temp = peoples[wall];
+            peoples[wall] = peoples[i];
+            peoples[i] = temp;
+            wall++;
+        }
+    }
+    peoples[high] = peoples[wall];
+    peoples[wall] = pivot;
+    return wall;
 }
 
-void printMatrix()
+void quickSort(int low, int high)
 {
-    for (int i = 0; i < peopleCount; i++)
+    if (low < high)
     {
-        for (int j = 0; j < peopleCount; j++)
-        {
-            printf(" %f ", chanceMatrix[getMatIndex(i,j, peopleCount)]);
-        }
-        printf("\n");
+        int pivotIndex = partition(low, high);
+        quickSort(low, pivotIndex - 1);
+        quickSort(pivotIndex + 1, high);
     }
+}
+
+void sortPeoples()
+{
+    quickSort(0, peopleCount - 1);
 }
 
 int main(int argc, char *argv[])
@@ -334,9 +310,9 @@ int main(int argc, char *argv[])
     }
     if (readPeopleFile(peopleFile) && readMeetingsFile(meetingFile))
     {
+        sortPeoples();
         printAllPeople();
-        UpdateChanceMatrix();
-        printMatrix();
+        writeOutputFile(OUTPUT_FILE);
         freeMain();
         return EXIT_SUCCESS;
     }
