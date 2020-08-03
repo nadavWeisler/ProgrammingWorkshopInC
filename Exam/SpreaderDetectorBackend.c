@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "SpreaderDetectorParams.h"
 
 #define OUTPUT_FILE "SpreaderDetectorAnalysis.out"
 #define OPEN_FILE_PERMISSION "r"
@@ -8,12 +9,13 @@
 #define NEW_LINE_CHAR '\n'
 #define BACKSLASH_R '\r'
 #define LINE_LENGTH 1024
-#define TRUE 0==0
-#define FALSE 0==1
+#define TRUE 0 == 0
+#define FALSE 0 == 1
 #define CONVERSION_BASE 10
 
-#include "SpreaderDetectorParams.h"
-
+/**
+ * @brief Struct that define a peron
+ */
 typedef struct person
 {
     char *name;
@@ -22,42 +24,142 @@ typedef struct person
     float chance;
 } Person;
 
+/**
+ * @brief Person BST struct
+ */
+typedef struct personNode
+{
+    Person *person;
+    struct personNode *left;
+    struct personNode *right;
+} PersonNode;
+
+PersonNode *peopleTree;
 Person **peoples;
 int peopleCount;
 
-Person *getPersonFromId(long id);
+/**
+ * @brief           Free root
+ * @param root      Person node
+ */
+void freeTree(PersonNode *root);
 
-void RemoveNewLineChar(char *line);
+/**
+ * @brief           Find person ib PersonNode BST
+ * @param node      BST node
+ * @param id        Person id (long)
+ * @return          Person pointer
+ */
+Person *findPerson(PersonNode *node, long id);
 
-void freePeoples();
+/**
+ * @brief           Create new node from person
+ * @param person    Person pointer
+ * @return          PersonNode
+ */
+PersonNode *createNewNode(Person *person);
 
-float crna(float distance, float time);
-
-void printPerson(Person *p);
-
-void updatePersonFromLine(Person *person, char *line);
-
-void updatePersonInfectedFromLine(char *line);
-
-int readPeopleFile(FILE *file);
-
-int readMeetingsFile(FILE *file);
-
+/**
+ * @brief Free memory
+ */
 void freeMain();
 
-void printAllPeople();
+/**
+ * @brief           Insert person to PersonNode BST
+ * @param node      PersonNode node
+ * @param person    Person pointer
+ * @return          PersonNode root
+ */
+PersonNode *insert(PersonNode *node, Person *person);
 
-void merge(int startIndex, int middleIndex, int endIndex);
+/**
+ * @brief           Remove new line and space from string
+ * @param str       String, (char array)
+ */
+void removeNewLineChar(char *str);
 
-void mergeSort(int startIndex, int endIndex);
+/**
+ * @brief Free people collection
+ */
+void freePeoples();
 
+/**
+ * @brief               Infection probability formula
+ * @param distance      Distance (float)
+ * @param time          Time (float)
+ * @return              Infection probability (float)
+ */
+float crna(float distance, float time);
+
+/**
+ * @brief           Sort people collection by quick sort algorithm
+ * @param low       Low index
+ * @param high      High index
+ */
+void quickSort(int low, int high);
+
+/**
+ * @brief           Calculate partition for quick sort algorithm
+ * @param low       Low index
+ * @param high      High index
+ * @return
+ */
+int partition(int low, int high);
+
+/**
+ * @brief           Update person value by file line
+ * @param person    Person pointer
+ * @param line      Line (string)
+ */
+void updatePersonFromLine(Person *person, char *line);
+
+/**
+ * @brief           Update person infection from line from meeting file
+ * @param line      Line from meeting file (string)
+ */
+void updatePersonInfectedFromLine(char *line);
+
+/**
+ * @brief           Read people in file
+ * @param file      People in file pointer
+ * @return          TRUE is succeeded, FALSE otherwise
+ */
+int readPeopleFile(FILE *file);
+
+/**
+ * @brief Sort people (quicksort algorithm)
+ */
+void sortPeoples();
+
+/**
+ * @brief           Read meetings file
+ * @param file      File pointer
+ * @return          TRUE is succeeded, FALSE otherwise
+ */
+int readMeetingsFile(FILE *file);
+
+/**
+ * @brief                   Write to output file
+ * @param outputFilePath    Output file path
+ */
 void writeOutputFile(char *outputFilePath);
 
+/**
+ * @brief               Infection probability formula
+ * @param distance      Distance (float)
+ * @param time          Time (float)
+ * @return              Infection probability (float)
+ */
 float crna(float distance, float time)
 {
     return (time * MIN_DISTANCE) / (distance * MAX_TIME);
 }
 
+/**
+ * @brief           Update person value by file line
+ * @param person    Person pointer
+ * @param line      Line (string)
+ */
 void updatePersonFromLine(Person *person, char *line)
 {
     char *splitLine = strtok(line, " ");
@@ -67,7 +169,8 @@ void updatePersonFromLine(Person *person, char *line)
     {
         if (count == 0)
         {
-            person->name = strdup(splitLine);
+            person->name = malloc(strlen(splitLine) + 1);
+            strcpy(person->name, splitLine);
         }
         else if (count == 1)
         {
@@ -83,6 +186,10 @@ void updatePersonFromLine(Person *person, char *line)
     person->chance = 0;
 }
 
+/**
+ * @brief           Update person infection from line from meeting file
+ * @param line      Line from meeting file (string)
+ */
 void updatePersonInfectedFromLine(char *line)
 {
     char *splitLine = strtok(line, " ");
@@ -98,12 +205,12 @@ void updatePersonInfectedFromLine(char *line)
         if (count == 0)
         {
             currentId = strtol(splitLine, literal, CONVERSION_BASE);
-            infector = getPersonFromId(currentId);
+            infector = findPerson(peopleTree, currentId);
         }
         else if (count == 1)
         {
             currentId = strtol(splitLine, literal, CONVERSION_BASE);
-            infected = getPersonFromId(currentId);
+            infected = findPerson(peopleTree, currentId);
         }
         else if (count == 2)
         {
@@ -124,23 +231,11 @@ void updatePersonInfectedFromLine(char *line)
     }
 }
 
-Person *getPersonFromId(long id)
-{
-    for (int i = 0; i < peopleCount; i++)
-    {
-        if (peoples[i]->id == id)
-        {
-            return peoples[i];
-        }
-    }
-    return NULL;
-}
-
-void printPerson(Person *p)
-{
-    printf("%s %lu %f %f\n", p->name, p->id, p->age, p->chance);
-}
-
+/**
+ * @brief           Read people in file
+ * @param file      People in file pointer
+ * @return          TRUE is succeeded, FALSE otherwise
+ */
 int readPeopleFile(FILE *file)
 {
     char line[LINE_LENGTH];
@@ -152,11 +247,12 @@ int readPeopleFile(FILE *file)
         {
             continue;
         }
-        RemoveNewLineChar(line);
+        removeNewLineChar(line);
         newPerson = (Person *) malloc(sizeof(Person));
         updatePersonFromLine(newPerson, line);
         if (newPerson != NULL)
         {
+            peopleTree = insert(peopleTree, newPerson);
             peopleCount++;
             peoples = (Person **) realloc(peoples, peopleCount * sizeof(Person *));
             peoples[peopleCount - 1] = newPerson;
@@ -169,15 +265,24 @@ int readPeopleFile(FILE *file)
     return TRUE;
 }
 
-void RemoveNewLineChar(char *line)
+/**
+ * @brief           Remove new line and space from string
+ * @param str       String, (char array)
+ */
+void removeNewLineChar(char *str)
 {
-    unsigned long strLen = strlen(line);
-    if (line[strLen - 1] == NEW_LINE_CHAR || line[strLen - 1] == BACKSLASH_R)
+    unsigned long strLen = strlen(str);
+    if (str[strLen - 1] == NEW_LINE_CHAR || str[strLen - 1] == BACKSLASH_R)
     {
-        line[strLen - 1] = '\0';
+        str[strLen - 1] = '\0';
     }
 }
 
+/**
+ * @brief           Read meetings file
+ * @param file      File pointer
+ * @return          TRUE is succeeded, FALSE otherwise
+ */
 int readMeetingsFile(FILE *file)
 {
     char line[LINE_LENGTH];
@@ -188,11 +293,11 @@ int readMeetingsFile(FILE *file)
 
     while (fgets(line, LINE_LENGTH, file))
     {
-        RemoveNewLineChar(line);
+        removeNewLineChar(line);
         if (firstLine)
         {
             currentId = strtol(line, literal, CONVERSION_BASE);
-            currentPerson = getPersonFromId(currentId);
+            currentPerson = findPerson(peopleTree, currentId);
             currentPerson->chance = 1;
             firstLine = FALSE;
         }
@@ -208,6 +313,10 @@ int readMeetingsFile(FILE *file)
     return TRUE;
 }
 
+/**
+ * @brief                   Write to output file
+ * @param outputFilePath    Output file path
+ */
 void writeOutputFile(char *outputFilePath)
 {
     FILE *outputFile = fopen(outputFilePath, WRITE_FILE_PERMISSION);
@@ -233,18 +342,16 @@ void writeOutputFile(char *outputFilePath)
     fclose(outputFile);
 }
 
-void freeMain()
-{
-    printf("Free!\n");
-    freePeoples();
-}
-
+/**
+ * @brief Free people collection
+ */
 void freePeoples()
 {
     if (peopleCount > 0)
     {
         for (int i = 0; i < peopleCount; i++)
         {
+            free(peoples[i]->name);
             free(peoples[i]);
         }
         free(peoples);
@@ -252,25 +359,21 @@ void freePeoples()
     peoples = NULL;
 }
 
-void printAllPeople()
-{
-    for (int i = 0; i < peopleCount; i++)
-    {
-        printf("---\n");
-        printPerson(peoples[i]);
-        printf("---\n");
-    }
-}
-
+/**
+ * @brief           Calculate partition for quick sort algorithm
+ * @param low       Low index
+ * @param high      High index
+ * @return
+ */
 int partition(int low, int high)
 {
-    Person* pivot = peoples[high];
+    Person *pivot = peoples[high];
     int wall = low;
     for (int i = low; i < high; i++)
     {
         if (peoples[i]->chance > pivot->chance)
         {
-            Person* temp = peoples[wall];
+            Person *temp = peoples[wall];
             peoples[wall] = peoples[i];
             peoples[i] = temp;
             wall++;
@@ -281,6 +384,11 @@ int partition(int low, int high)
     return wall;
 }
 
+/**
+ * @brief           Sort people collection by quick sort algorithm
+ * @param low       Low index
+ * @param high      High index
+ */
 void quickSort(int low, int high)
 {
     if (low < high)
@@ -291,9 +399,95 @@ void quickSort(int low, int high)
     }
 }
 
+/**
+ * @brief Sort people (quicksort algorithm)
+ */
 void sortPeoples()
 {
     quickSort(0, peopleCount - 1);
+}
+
+/**
+ * @brief           Free root
+ * @param root      Person node
+ */
+void freeTree(PersonNode *root)
+{
+    if (root != NULL)
+    {
+        freeTree(root->left);
+        freeTree(root->right);
+        free(root);
+    }
+}
+
+/**
+ * @brief           Find person ib PersonNode BST
+ * @param node      BST node
+ * @param id        Person id (long)
+ * @return          Person pointer
+ */
+Person *findPerson(PersonNode *node, long id)
+{
+    if (node == NULL || node->person->id == id)
+    {
+        return node->person;
+    }
+
+    if (node->person->id < id)
+    {
+        return findPerson(node->right, id);
+    }
+    else
+    {
+        return findPerson(node->left, id);
+    }
+}
+
+/**
+ * @brief           Create new node from person
+ * @param person    Person pointer
+ * @return          PersonNode
+ */
+PersonNode *createNewNode(Person *person)
+{
+    PersonNode *result = (PersonNode *) malloc(sizeof(PersonNode));
+    result->person = person;
+    result->right = NULL;
+    result->left = NULL;
+    return result;
+}
+
+/**
+ * @brief           Insert person to PersonNode BST
+ * @param node      PersonNode node
+ * @param person    Person pointer
+ * @return          PersonNode root
+ */
+PersonNode *insert(PersonNode *node, Person *person)
+{
+    if (node == NULL)
+    {
+        return createNewNode(person);
+    }
+    if (person->id < node->person->id)
+    {
+        node->left = insert(node->left, person);
+    }
+    else if (person->id > node->person->id)
+    {
+        node->right = insert(node->right, person);
+    }
+    return node;
+}
+
+/**
+ * @brief Free memory
+ */
+void freeMain()
+{
+    freePeoples();
+    freeTree(peopleTree);
 }
 
 int main(int argc, char *argv[])
@@ -311,7 +505,6 @@ int main(int argc, char *argv[])
     if (readPeopleFile(peopleFile) && readMeetingsFile(meetingFile))
     {
         sortPeoples();
-        printAllPeople();
         writeOutputFile(OUTPUT_FILE);
         freeMain();
         return EXIT_SUCCESS;
