@@ -9,10 +9,10 @@
 #define NEW_LINE_CHAR '\n'
 #define BACKSLASH_R '\r'
 #define LINE_LENGTH 1024
-#define TRUE 0 == 0
-#define FALSE 0 == 1
+#define TRUE 0
+#define FALSE 1
 #define CONVERSION_BASE 10
-#define BAD_FORMAT_ERROR "Usage: ./SpreaderDetectorBackend %s %s\n”"
+#define BAD_FORMAT_ERROR "Usage: ./SpreaderDetectorBackend %s %s\n"
 #define ERROR_IN_INPUT_FILE "Error in input files.\n"
 #define ERROR_IN_OUTPUT_FILE "Error in output file.\n”"
 #define POINT '.'
@@ -24,7 +24,6 @@
 #define DISTANCE 2
 #define TIME 3
 #define ID 1
-#define AGE 2
 #define NAME 0
 #define PEOPLE_ARGS_COUNT 3
 #define MEETINGS_ARGS_COUNT 4
@@ -232,10 +231,6 @@ int updatePersonFromLine(Person *person, char *line)
                 return LIBRARY_ERROR;
             }
         }
-        else if(count == AGE)
-        {
-            continue;
-        }
         count++;
         splitLine = strtok(NULL, " ");
     }
@@ -256,7 +251,8 @@ int updatePersonFromLine(Person *person, char *line)
  */
 int validateLong(char *str)
 {
-    for (int i = 0; i < strlen(str); i++)
+    removeNewLineChar(str);
+    for (size_t i = 0; i < strlen(str); i++)
     {
         if (str[i] < '0' || str[i] > '9')
         {
@@ -273,7 +269,8 @@ int validateLong(char *str)
  */
 int validateId(char *str)
 {
-    if (validateLong(str) && strlen(str) == 9)
+    removeNewLineChar(str);
+    if (validateLong(str) == TRUE && strlen(str) == 9)
     {
         return TRUE;
     }
@@ -290,14 +287,15 @@ int validateId(char *str)
  */
 int validateFloat(char *str)
 {
+    removeNewLineChar(str);
     int sawPoint = FALSE;
-    for (int i = 0; i < strlen(str); i++)
+    for (size_t i = 0; i < strlen(str); i++)
     {
         if ('0' > str[i] || str[i] > '9')
         {
-            if (str[i] == POINT && sawPoint == FALSE)
+            if ((str[i] == POINT) && (sawPoint == FALSE))
             {
-                sawPoint == TRUE;
+                sawPoint = TRUE;
             }
             else
             {
@@ -488,7 +486,7 @@ int readMeetingsFile(FILE *file)
     while (fgets(line, LINE_LENGTH, file))
     {
         removeNewLineChar(line);
-        if (firstLine)
+        if (firstLine == TRUE)
         {
             if (validateId(line) == FALSE)
             {
@@ -798,6 +796,7 @@ int main(int argc, char *argv[])
     {
         freeTree(peopleTree);
     }
+
     return retValue;
 
 }
